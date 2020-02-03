@@ -1,63 +1,16 @@
-; This program shows how to read many push buttons using just one analog input.
-; The idea is to make a voltage divider with many resistors and the push buttons
-; connect the diferent voltages to an analog input.  In this example we have seven push
-; buttons.  The diagram is in this image: push_button_adc.jpg.  The common pin of all
-; the push buttons is connected to one of the analog input pins of ADC0.  Warning:
-; since P2.0 and P2.1 are used with the LCD we can not use those channels with ADC0.
-; The common input for all the push buttons is AD0DAT1 which is P1.7.
-;
-
-$MOD9351
-
-XTAL EQU 7373000
-BAUD EQU 115200
-BRVAL EQU ((XTAL/BAUD)-16)
-
-CSEG at 0x0000
-ljmp	MainProgram
-
-DSEG at 0x30
-x:   ds 4
-y:   ds 4
-bcd: ds 5
-
-
-BSEG
-mf: dbit 1
-PB0: dbit 1 ; Variable to store the state of pushbutton 0 after calling ADC_to_PB below
-PB1: dbit 1 ; Variable to store the state of pushbutton 1 after calling ADC_to_PB below
-PB2: dbit 1 ; Variable to store the state of pushbutton 2 after calling ADC_to_PB below
-PB3: dbit 1 ; Variable to store the state of pushbutton 3 after calling ADC_to_PB below
-PB4: dbit 1 ; Variable to store the state of pushbutton 4 after calling ADC_to_PB below
-PB5: dbit 1 ; Variable to store the state of pushbutton 5 after calling ADC_to_PB below
-PB6: dbit 1 ; Variable to store the state of pushbutton 6 after calling ADC_to_PB below
-
-cseg
-; These 'equ' must match the wiring between the microcontroller and the LCD!
-LCD_RS equ P0.7
-LCD_RW equ P3.0
-LCD_E  equ P3.1
-LCD_D4 equ P2.3
-LCD_D5 equ P2.4
-LCD_D6 equ P2.5
-LCD_D7 equ P2.6
-$NOLIST
-$include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
-$INCLUDE(math32.inc)
-$LIST
-
-
+;EXTRN code (Load_X, Load_y)
 Wait10us:
     mov R0, #18
     djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
 	ret
+
 putchar:
 	jbc	TI,putchar_L1
 	sjmp putchar
 putchar_L1:
 	mov	SBUF,a
 	ret
-	
+
 getchar:
 	jbc	RI,getchar_L1
 	sjmp getchar
@@ -268,45 +221,9 @@ Display_PushButtons_ADC:
 
 Title: db 'ADC0 push buttons', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
-	
-MainProgram:
-    mov SP, #0x7F
 
-    ; Configure all the ports in bidirectional mode:
-    mov P0M1, #00H
-    mov P0M2, #00H
-    mov P1M1, #00H
-    mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1kohm pull-up resistors!
-    mov P2M1, #00H
-    mov P2M2, #00H
-    mov P3M1, #00H
-    mov P3M2, #00H
-	
-	lcall InitSerialPort
-	lcall InitADC0
-	
-    lcall LCD_4BIT
-    ; For convenience a few handy macros are included in 'LCD_4bit_LPC9351.inc':
-	Set_Cursor(1, 1)
-    Send_Constant_String(#Title)
-
-	lcall Wait1S ; Wait a bit so PUTTy has a chance to start
-	mov dptr, #InitialMessage
-	lcall SendString
-
-forever_loop:
-    ; Send the conversion results via the serial port to putty.
-	mov a, #'\r' ; move cursor all the way to the left
-    lcall putchar
-    ; Display converted value from P1.7
-	mov	b, AD0DAT0
-	lcall SendHex
-	
-	mov	b, AD0DAT1
-	lcall SendHex
-	
-	; lm355 measurement starts here
-	Load_x(0)
+Read_Temperature:
+  	Load_X(0)
     mov x+0, AD0DAT1
 	mov R7, #255
     lcall Wait10us
@@ -320,29 +237,20 @@ accumulate_loop:
 	djnz R7, accumulate_loop
 	
 	; Now divide by 16 (2^4)
-	Load_Y(16)
+	Load_y(16)
 	lcall div32
 	; x has now the 12-bit representation of the temperature
 	
 	; Convert to temperature (C)
-	Load_Y(43000) ; Vref is 4.3V
+	Load_y(43000) ; Vref is 4.3V
 	lcall mul32
-	Load_Y(((1<<12)-1)) ; 2^12-1
+	Load_y(((1<<12)-1)) ; 2^12-1
 	lcall div32
-	Load_Y(27300)
+	Load_y(27300)
 	lcall sub32
 	
 	lcall hex2bcd
 	
 	lcall SendTemp 
-
-	; lm355 temp sent and calc finished here
-	
-	lcall ADC_to_PB
-	lcall Display_PushButtons_ADC
-	lcall Wait1S
-	
-	ljmp forever_loop
-
-
+  ret
 end

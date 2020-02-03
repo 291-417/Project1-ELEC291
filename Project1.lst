@@ -1,0 +1,146 @@
+0000              1   ; Project 1: Reflow oven controller
+0000              2   ; ELEC 291 UBC
+0000              3   ; Oakley Bach-Raabe, Jashan Brar, Trevor MacKay, Ryan Meshulam, Anusika Nijher
+0000              4   ; Includes modified code from Jesus Calvino-Fraga
+0000              5   ; GPL v3
+                  7   $LIST
+0000              9   
+0000             10   CLK         EQU 14746000  ; Microcontroller system clock frequency in Hz
+0000             11   CCU_RATE    EQU 22050     ; 22050Hz is the sampling rate of the wav file we are playing
+0000             12   CCU_RELOAD  EQU ((65536-((CLK/(2*CCU_RATE)))))
+0000             13   BAUD        EQU 115200
+0000             14   BRVAL       EQU ((CLK/BAUD)-16)
+0000             15   XTAL        EQU 7373000
+0000             16   
+0000             17   LCD_RS equ P1.6
+0000             18   LCD_RW equ P1.4
+0000             19   LCD_E  equ P1.3
+0000             20   LCD_D4 equ P0.7
+0000             21   LCD_D5 equ P0.6
+0000             22   LCD_D6 equ P0.5
+0000             23   LCD_D7 equ P0.3
+0000             24   
+0000             25   PLAY_BUTTON equ P3.0
+0000             26   
+0000             27   FLASH_CE    EQU P2.4
+0000             28   
+0030             29   dseg at 30H
+0030             30            w:   ds 3 ; 24-bit play counter.  Decremented in CCU ISR.
+0033             31     x:   ds 4
+0037             32     y:   ds 4
+003B             33     bcd: ds 5
+0040             34    
+0000             35   bseg
+0000             36   
+0000             37   mf: dbit 1
+0001             38   PB0: dbit 1 ; Variable to store the state of pushbutton 0 after calling ADC_to_PB below
+0002             39   PB1: dbit 1 ; Variable to store the state of pushbutton 1 after calling ADC_to_PB below
+0003             40   PB2: dbit 1 ; Variable to store the state of pushbutton 2 after calling ADC_to_PB below
+0004             41   PB3: dbit 1 ; Variable to store the state of pushbutton 3 after calling ADC_to_PB below
+0005             42   PB4: dbit 1 ; Variable to store the state of pushbutton 4 after calling ADC_to_PB below
+0006             43   PB5: dbit 1 ; Variable to store the state of pushbutton 5 after calling ADC_to_PB below
+0007             44   PB6: dbit 1 ; Variable to store the state of pushbutton 6 after calling ADC_to_PB below
+0008             45   
+0000             46   cseg
+0000             47   
+0000             48   org 0x0000 ; Reset vector
+0000 020898      49       ljmp MainProgram
+0003             50   
+0003             51   org 0x0003 ; External interrupt 0 vector (not used in this code)
+0003 32          52            reti
+0004             53   
+000B             54   org 0x000B ; Timer/Counter 0 overflow interrupt vector (not used in this code)
+000B 32          55            reti
+000C             56   
+0013             57   org 0x0013 ; External interrupt 1 vector (not used in this code)
+0013 32          58            reti
+0014             59   
+001B             60   org 0x001B ; Timer/Counter 1 overflow interrupt vector (not used in this code
+001B 32          61            reti
+001C             62   
+0023             63   org 0x0023 ; Serial port receive/transmit interrupt vector (not used in this code)
+0023 32          64            reti
+0024             65   
+005B             66   org 0x005b ; CCU interrupt vector.  Used in this code to replay the wave file.
+005B 0203C5      67            ljmp CCU_ISR
+005E             68   
+005E             69   
+005E             70   
+                546   $LIST
+                 75   $LIST
+087F             77   
+087F             78   ;---------------------------------;
+087F             79   ; Initial configuration of ports. ;
+087F             80   ; After reset the default for the ;
+087F             81   ; pins is 'Open Drain'.  This     ;
+087F             82   ; routine changes them pins to    ;
+087F             83   ; Quasi-bidirectional like in the ;
+087F             84   ; original 8051.                  ;
+087F             85   ; Notice that P1.2 and P1.3 are   ;
+087F             86   ; always 'Open Drain'. If those   ;
+087F             87   ; pins are to be used as output   ;
+087F             88   ; they need a pull-up resistor.   ;
+087F             89   ;---------------------------------;
+087F             90   Ports_Init:
+087F             91       ; Configure all the ports in bidirectional mode:
+087F 758400      92       mov P0M1, #00H
+0882 758500      93       mov P0M2, #00H
+0885 759100      94       mov P1M1, #00H
+0888 759200      95       mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1 kohm pull-up resistors if used as outputs!
+088B 75A400      96       mov P2M1, #00H
+088E 75A500      97       mov P2M2, #00H
+0891 75B100      98       mov P3M1, #00H
+0894 75B200      99       mov P3M2, #00H
+0897 22         100            ret
+0898            101   
+0898            102   MainProgram:
+0898 75817F     103     mov SP, #0x7F
+089B            104     
+089B 12087F     105     lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
+089E 120406     106     lcall Double_Clk
+08A1 1203F6     107     lcall InitDAC ; Call after 'Ports_Init
+08A4 1203AE     108            lcall CCU_Init
+08A7 12040E     109            lcall Init_SPI
+08AA            110     
+08AA 120668     111     lcall InitSerialPort
+08AD 12067E     112            lcall InitADC0
+08B0 120326     113     lcall LCD_4BIT
+08B3            114   
+08B3            115     ; Set beginning message on LCD
+08B3 C0E0       116            push acc
+08B5 7401       116            mov a, #1
+08B7 14         116            dec a
+08B8 120368     116            lcall ?Set_Cursor_1 ; Select column and row
+08BB D0E0       116            pop acc
+08BD C083       117            push dph
+08BF C082       117            push dpl
+08C1 C0E0       117            push acc
+08C3 9007B4     117            mov dptr, #Title
+08C6 12035B     117            lcall ?Send_Constant_String
+08C9 D0E0       117            pop acc
+08CB D082       117            pop dpl
+08CD D083       117            pop dph
+08CF            118   
+08CF 12065B     119     lcall Wait1S ; Wait a bit so PUTTy has a chance to start
+08D2            120   
+08D2 9007C6     121     mov dptr, #InitialMessage
+08D5 12070A     122            lcall SendString
+08D8            123   
+08D8 C2C8       124     clr TMOD20 ; Stop CCU timer
+08DA D2AF       125            setb EA ; Enable global interrupts.
+08DC            126   
+08DC            127   forever:
+08DC 120814     128     lcall Read_Temperature
+08DF 120715     129     lcall ADC_to_PB
+08E2 12076A     130            lcall Display_PushButtons_ADC
+08E5 20B0F4     131            jb PLAY_BUTTON, forever
+08E8 C002       132            push AR2
+08EA 7A32       132            mov R2, #50
+08EC 1202D7     132            lcall ?Wait_Milli_Seconds
+08EF D002       132            pop AR2
+08F1 20B0E8     133     jb PLAY_BUTTON, forever
+08F4 30B0FD     134     jnb PLAY_BUTTON, $
+08F7 120383     135     lcall Play_Whole_Memory
+08FA 0208DC     136     ljmp forever
+08FD            137   
+08FD            138   en

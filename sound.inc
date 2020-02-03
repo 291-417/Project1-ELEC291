@@ -4,7 +4,45 @@
 ; Includes modified code from Jesus Calvino-Fraga
 ; GPL v3
 
+; Commands supported by the SPI flash memory according to the datasheet
+WRITE_ENABLE     EQU 0x06  ; Address:0 Dummy:0 Num:0
+WRITE_DISABLE    EQU 0x04  ; Address:0 Dummy:0 Num:0
+READ_STATUS      EQU 0x05  ; Address:0 Dummy:0 Num:1 to infinite
+READ_BYTES       EQU 0x03  ; Address:3 Dummy:0 Num:1 to infinite
+READ_SILICON_ID  EQU 0xab  ; Address:0 Dummy:3 Num:1 to infinite
+FAST_READ        EQU 0x0b  ; Address:3 Dummy:1 Num:1 to infinite
+WRITE_STATUS     EQU 0x01  ; Address:0 Dummy:0 Num:1
+WRITE_BYTES      EQU 0x02  ; Address:3 Dummy:0 Num:1 to 256
+ERASE_ALL        EQU 0xc7  ; Address:0 Dummy:0 Num:0
+ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
+READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
+
 cseg
+Play_Whole_Memory:
+; Play the whole memory
+	clr TMOD20 ; Stop the CCU from playing previous request
+	setb FLASH_CE
+	
+	clr FLASH_CE ; Enable SPI Flash
+	mov a, #READ_BYTES
+	lcall Send_SPI
+	; Set the initial position in memory where to start playing
+	mov a, #0
+	lcall Send_SPI
+	mov a, #0
+	lcall Send_SPI
+	mov a, #0xff
+	lcall Send_SPI
+	; How many bytes to play? All of them!  Asume 4Mbytes memory
+	mov w+2, #0x3f
+	mov w+1, #0xff
+	mov w+0, #0x00
+	
+	mov a, #0x00 ; Request first byte to send to DAC
+	lcall Send_SPI
+	
+	setb TMOD20 ; Start playback by enabling CCU timer
+  ret
 
 ;---------------------------------;
 ; Routine to initialize the CCU.  ;
@@ -254,3 +292,5 @@ CRC16_TL:
 	db	026h, 007h, 064h, 045h, 0A2h, 083h, 0E0h, 0C1h
 	db	01Fh, 03Eh, 05Dh, 07Ch, 09Bh, 0BAh, 0D9h, 0F8h
 	db	017h, 036h, 055h, 074h, 093h, 0B2h, 0D1h, 0F0h
+
+end
