@@ -49,7 +49,7 @@ InitADC0:
     anl P2M2, #11111100b
 	; Setup ADC0
 	setb BURST0 ; Autoscan continuos conversion mode
-	mov	ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
+	orl	ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
 	mov	ADINS,#0x0F ; Select four channels of ADC0 for conversion
 	mov	ADCON0,#0x05 ; Enable the converter and start immediately
 	; Wait for first conversion to complete
@@ -187,37 +187,7 @@ ADC_to_PB_L0:
 	; No pusbutton pressed	
 	ret
 
-Display_PushButtons_ADC:
-	Set_Cursor(2, 1)
-	mov a, #'0'
-	mov c, PB6
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB5
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB4
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB3
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB2
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB1
-	addc a, #0
-    lcall ?WriteData	
-	mov a, #'0'
-	mov c, PB0
-	addc a, #0
-    lcall ?WriteData	
-	ret
+
 
 Title: db 'ADC0 push buttons', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0

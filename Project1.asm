@@ -14,13 +14,13 @@ BAUD        EQU 115200
 BRVAL       EQU ((CLK/BAUD)-16)
 XTAL        EQU 7373000
 
-LCD_RS equ P1.6
-LCD_RW equ P1.4
-LCD_E  equ P1.3
-LCD_D4 equ P0.7
-LCD_D5 equ P0.6
-LCD_D6 equ P0.5
-LCD_D7 equ P0.3
+;LCD_RS equ P1.6
+;LCD_RW equ P1.4
+;LCD_E  equ P1.3
+;LCD_D4 equ P0.7
+;LCD_D5 equ P0.6
+;LCD_D6 equ P0.5
+;LCD_D7 equ P0.3
 
 PLAY_BUTTON equ P3.0
 
@@ -70,7 +70,7 @@ org 0x005b ; CCU interrupt vector.  Used in this code to replay the wave file.
 
 $NOLIST
 $INCLUDE(math32.inc)
-$include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
+;$include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
 $include(sound.inc)
 $include(temppb.inc)
 $LIST
@@ -110,11 +110,11 @@ MainProgram:
   
   lcall InitSerialPort
 	lcall InitADC0
-  lcall LCD_4BIT
+  ;lcall LCD_4BIT
 
   ; Set beginning message on LCD
-  Set_Cursor(1, 1)
-  Send_Constant_String(#Title)
+  ;Set_Cursor(1, 1)
+  ;Send_Constant_String(#Title)
 
   lcall Wait1S ; Wait a bit so PUTTy has a chance to start
 
@@ -127,9 +127,9 @@ MainProgram:
 forever:
   lcall Read_Temperature
   lcall ADC_to_PB
-	lcall Display_PushButtons_ADC
+	;lcall Display_PushButtons_ADC
 	jb PLAY_BUTTON, forever
-  Wait_Milli_Seconds(#50)
+  ;Wait_Milli_Seconds(#50)
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
   lcall Play_Whole_Memory
