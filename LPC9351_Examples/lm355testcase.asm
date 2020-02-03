@@ -129,6 +129,24 @@ SendString:
 SendString_L1:
 	ret
 
+SendHex:
+	mov a, #'0'
+	lcall putchar
+	mov a, #'x'
+	lcall putchar
+	mov dptr, #HexAscii 
+	mov a, b
+	swap a
+	anl a, #0xf
+	movc a, @a+dptr
+	lcall putchar
+	mov a, b
+	anl a, #0xf
+	movc a, @a+dptr
+	lcall putchar
+	mov a, #' '
+	lcall putchar
+	ret
 Wait10us:
     mov R0, #18
     djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
@@ -166,7 +184,7 @@ accumulate_loop:
 	; x has now the 12-bit representation of the temperature
 	
 	; Convert to temperature (C)
-	Load_Y(50000) ; Vref is 3.3V
+	Load_Y(33000) ; Vref is 3.3V
 	lcall mul32
 	Load_Y(((1<<12)-1)) ; 2^12-1
 	lcall div32
@@ -174,6 +192,9 @@ accumulate_loop:
 	lcall sub32
 	
 	lcall hex2bcd
+	
+	mov	b, AD0DAT0
+	lcall SendHex
 	
 	lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
 	lcall Wait1S
