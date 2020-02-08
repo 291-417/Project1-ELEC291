@@ -161,9 +161,9 @@ forever:
   lcall Get_Thermocouple
   lcall ADC_to_PB
 	lcall Wait1S
-	jb BUTTON, next
+	jb DIP_BUTTON1, next
 	Wait_Milli_Seconds(#50)	
-	jb BUTTON, next
+	jb DIP_BUTTON1, next
 	lcall Display_PushButtons_ADC
 next_check:
   jb PLAY_BUTTON, forever

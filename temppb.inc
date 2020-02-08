@@ -191,8 +191,8 @@ ADC_to_PB_L0:
 
 Title: db 'ADC0 push buttons', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
-Thermocouple: db 'Thermocouple difference', 0
-Temp: db 'Temp from LM335', 0
+Thermocouple: db 'Thermocouple difference: ', 0
+Temp: db 'Temp from LM335: ', 0
 blank: db '                 ', 0
 Read_Temperature:
   	Load_X(0)
