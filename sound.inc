@@ -18,15 +18,47 @@ ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
 READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
-
+$include(obamaindex.inc)
 Play_Character:
 ; Assumes that character is in BCD in lower four bits of accumulator
-	push r0
+	push ar0
+	push ar1
 	anl a, #0x0f ; just make sure that it's only the lower bits
+	setb c
+	subb a, #0 ; We're starting from zero so we need to subtract one
+	mov b, #3 ; Each row is three bytes
+	mul ab ; Multiplication to get number of bytes instead of number of rows
+	mov r0, a ; Store it so that we don't have to do it again
+	mov dptr, #sound_index ; Base address is sound_index
+	movc a, @a+dptr ; Move data from flash memory into accumulator
+	mov sound_start+2, a ; Move data to place where it's read by Play_Segment
+	inc r0 ; increment the counter so that we get the next bit
+	mov a, r0
+	movc a, @a+dptr
+	mov sound_start+1, a
+	inc r0
+	mov a, r0
+	movc a, @a+dptr
+	mov sound_start+0, a
+	; Now start with length of sound
+	mov dptr, #Size_sound ; Base address is Size_sound
+	clr c
+	mov a, r0
+	subb a, #2
 	mov r0, a
-	add a, #sound_start
-
-	pop r0
+	movc a, @a+dptr
+	mov w+2, a
+	inc r0
+	mov a, r0
+	movc a, @a+dptr
+	mov w+1, a
+	inc r0
+	mov a, r0
+	movc a, @a+dptr
+	mov w+0, a
+	lcall Play_Segment
+	pop ar1
+	pop ar0
 	ret
 
 Play_Segment:

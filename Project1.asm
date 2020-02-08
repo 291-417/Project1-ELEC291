@@ -170,33 +170,13 @@ next_check:
   ;Wait_Milli_Seconds(#50)
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
-  mov w+0, #0x30
-  mov w+1, #0x23
-  mov w+2, #0x00
-  mov sound_start+0, #0x4d
-  mov sound_start+1, #0x00
-  mov sound_start+2, #0x00
-  lcall Play_Segment
+
+  mov a, #1
+  lcall Play_Character
   Wait_Milli_Seconds(#255)
+  mov a, #2
   Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  ;Wait_Milli_Seconds(#255)
-  mov sound_start+0, #0x86
-  mov sound_start+1, #0x01
-  mov sound_start+2, #0x05
-  mov w+0, #0xc8
-  mov w+1, #0x2a
-  lcall Play_Segment
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  mov sound_start+0, #0xab
-  mov sound_start+1, #0x99
-  mov sound_start+2, #0x01
-  mov w+0, #0xcc
-  mov w+1, #0x31
-  mov w+2, #0x00
-  lcall Play_Segment
+  mov a, #3
   ljmp forever
 
 
