@@ -1,3 +1,5 @@
 *.db
 myindex.asm
 localFolder
+*.hex
+*.lst
