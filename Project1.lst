@@ -19,8 +19,8 @@
 0000             21   LCD_D5 equ P1.3
 0000             22   LCD_D6 equ P1.4
 0000             23   LCD_D7 equ P1.6
-0000             24   
-0000             25   PLAY_BUTTON equ P3.0
+0000             24   DIP_BUTTON1 equ P3.0
+0000             25   PLAY_BUTTON equ P0.3
 0000             26   SOUND equ P2.7
 0000             27   
 0000             28   FLASH_CE    EQU P2.4
@@ -46,7 +46,7 @@
 0000             48   cseg
 0000             49   
 0000             50   org 0x0000 ; Reset vector
-0000 0208E7      51       ljmp MainProgram
+0000 02096B      51       ljmp MainProgram
 0003             52   
 0003             53   org 0x0003 ; External interrupt 0 vector (not used in this code)
 0003 32          54            reti
@@ -70,102 +70,109 @@
 005E             72   
                 546   $LIST
                  77   $LIST
-08A7             79   
-08A7             80   ;---------------------------------;
-08A7             81   ; Initial configuration of ports. ;
-08A7             82   ; After reset the default for the ;
-08A7             83   ; pins is 'Open Drain'.  This     ;
-08A7             84   ; routine changes them pins to    ;
-08A7             85   ; Quasi-bidirectional like in the ;
-08A7             86   ; original 8051.                  ;
-08A7             87   ; Notice that P1.2 and P1.3 are   ;
-08A7             88   ; always 'Open Drain'. If those   ;
-08A7             89   ; pins are to be used as output   ;
-08A7             90   ; they need a pull-up resistor.   ;
-08A7             91   ;---------------------------------;
-08A7             92   Ports_Init:
-08A7             93       ; Configure all the ports in bidirectional mode:
-08A7 758400      94       mov P0M1, #00H
-08AA 758500      95       mov P0M2, #00H
-08AD 759100      96       mov P1M1, #00H
-08B0 759200      97       mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1 kohm pull-up resistors if used as outputs!
-08B3 75A400      98       mov P2M1, #00H
-08B6 75A500      99       mov P2M2, #00H
-08B9 75B100     100       mov P3M1, #00H
-08BC 75B200     101       mov P3M2, #00H
-08BF 22         102            ret
-08C0            103   
-08C0            104   ; Display a 3-digit BCD number in the LCD
-08C0            105   LCD_3BCD:
-08C0 E53C       106            mov a, bcd+1
-08C2 540F       107            anl a, #0x0f
-08C4 4430       108            orl a, #'0'
-08C6 12031C     109            lcall ?WriteData
-08C9 E53B       110            mov a, bcd+0
-08CB C4         111            swap a
-08CC 540F       112            anl a, #0x0f
-08CE 4430       113            orl a, #'0'
-08D0 12031C     114            lcall ?WriteData
-08D3 E53B       115            mov a, bcd+0
-08D5 540F       116            anl a, #0x0f
-08D7 4430       117            orl a, #'0'
-08D9 12031C     118            lcall ?WriteData
-08DC 22         119            ret
-08DD            120   
-08DD            121   Sound_Start_Init:
-08DD 7540FF     122     mov sound_start+0, #0xff
-08E0 754100     123     mov sound_start+1, #0x00
-08E3 754200     124     mov sound_start+2, #0x00
-08E6 22         125     ret
-08E7            126   
-08E7            127   MainProgram:
-08E7 75817F     128     mov SP, #0x7F
-08EA            129     
-08EA 1208DD     130     lcall Sound_Start_Init
-08ED 1208A7     131     lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
-08F0 12042E     132     lcall Double_Clk
-08F3 12041E     133     lcall InitDAC ; Call after 'Ports_Init
-08F6 1203D4     134            lcall CCU_Init
-08F9 120436     135            lcall Init_SPI
-08FC            136     
-08FC 120690     137     lcall InitSerialPort
-08FF 1206A6     138            lcall InitADC0
-0902 120326     139     lcall LCD_4BIT
-0905            140   
-0905            141     ; Set beginning message on LCD
-0905 C0E0       142            push acc
-0907 7401       142            mov a, #1
-0909 14         142            dec a
-090A 120368     142            lcall ?Set_Cursor_1 ; Select column and row
-090D D0E0       142            pop acc
-090F C083       143            push dph
-0911 C082       143            push dpl
-0913 C0E0       143            push acc
-0915 900792     143            mov dptr, #Title
-0918 12035B     143            lcall ?Send_Constant_String
-091B D0E0       143            pop acc
-091D D082       143            pop dpl
-091F D083       143            pop dph
-0921            144   
-0921 120683     145     lcall Wait1S ; Wait a bit so PUTTy has a chance to start
-0924            146   
-0924 9007A4     147     mov dptr, #InitialMessage
-0927 120732     148            lcall SendString
-092A            149   
-092A C2A7       150     clr SOUND ; Disable speaker
-092C C2C8       151     clr TMOD20 ; Stop CCU timer
-092E D2AF       152            setb EA ; Enable global interrupts.
-0930            153   
-0930            154   forever:
-0930 1207F2     155     lcall Read_Temperature
-0933 12073D     156     lcall ADC_to_PB
-0936 12085D     157            lcall Display_PushButtons_ADC
-0939 20B0F4     158            jb PLAY_BUTTON, forever
-093C            159     ;Wait_Milli_Seconds(#50)
-093C 20B0F1     160     jb PLAY_BUTTON, forever
-093F 30B0FD     161     jnb PLAY_BUTTON, $
-0942            162     ;mov 
-0942 1203A7     163     lcall Play_Whole_Memory
-0945 020930     164     ljmp forever
-0948            165   
-0948            166   en
+092B             79   
+092B             80   ;---------------------------------;
+092B             81   ; Initial configuration of ports. ;
+092B             82   ; After reset the default for the ;
+092B             83   ; pins is 'Open Drain'.  This     ;
+092B             84   ; routine changes them pins to    ;
+092B             85   ; Quasi-bidirectional like in the ;
+092B             86   ; original 8051.                  ;
+092B             87   ; Notice that P1.2 and P1.3 are   ;
+092B             88   ; always 'Open Drain'. If those   ;
+092B             89   ; pins are to be used as output   ;
+092B             90   ; they need a pull-up resistor.   ;
+092B             91   ;---------------------------------;
+092B             92   Ports_Init:
+092B             93       ; Configure all the ports in bidirectional mode:
+092B 758400      94       mov P0M1, #00H
+092E 758500      95       mov P0M2, #00H
+0931 759100      96       mov P1M1, #00H
+0934 759200      97       mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1 kohm pull-up resistors if used as outputs!
+0937 75A400      98       mov P2M1, #00H
+093A 75A500      99       mov P2M2, #00H
+093D 75B100     100       mov P3M1, #00H
+0940 75B200     101       mov P3M2, #00H
+0943 22         102            ret
+0944            103   
+0944            104   ; Display a 3-digit BCD number in the LCD
+0944            105   LCD_3BCD:
+0944 E53C       106            mov a, bcd+1
+0946 540F       107            anl a, #0x0f
+0948 4430       108            orl a, #'0'
+094A 12031C     109            lcall ?WriteData
+094D E53B       110            mov a, bcd+0
+094F C4         111            swap a
+0950 540F       112            anl a, #0x0f
+0952 4430       113            orl a, #'0'
+0954 12031C     114            lcall ?WriteData
+0957 E53B       115            mov a, bcd+0
+0959 540F       116            anl a, #0x0f
+095B 4430       117            orl a, #'0'
+095D 12031C     118            lcall ?WriteData
+0960 22         119            ret
+0961            120   
+0961            121   Sound_Start_Init:
+0961 7540FF     122     mov sound_start+0, #0xff
+0964 754100     123     mov sound_start+1, #0x00
+0967 754200     124     mov sound_start+2, #0x00
+096A 22         125     ret
+096B            126   
+096B            127   MainProgram:
+096B 75817F     128     mov SP, #0x7F
+096E            129     
+096E 120961     130     lcall Sound_Start_Init
+0971 12092B     131     lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
+0974 12042E     132     lcall Double_Clk
+0977 12041E     133     lcall InitDAC ; Call after 'Ports_Init
+097A            134            
+097A 1203D4     135     lcall CCU_Init
+097D 120436     136     lcall Init_SPI
+0980            137     
+0980 120690     138     lcall InitSerialPort
+0983 1206A6     139     lcall InitADC0
+0986 120326     140     lcall LCD_4BIT
+0989            141   
+0989            142     ; Set beginning message on LCD
+0989 C0E0       143            push acc
+098B 7401       143            mov a, #1
+098D 14         143            dec a
+098E 120368     143            lcall ?Set_Cursor_1 ; Select column and row
+0991 D0E0       143            pop acc
+0993 C083       144            push dph
+0995 C082       144            push dpl
+0997 C0E0       144            push acc
+0999 900792     144            mov dptr, #Title
+099C 12035B     144            lcall ?Send_Constant_String
+099F D0E0       144            pop acc
+09A1 D082       144            pop dpl
+09A3 D083       144            pop dph
+09A5            145   
+09A5 120683     146     lcall Wait1S ; Wait a bit so PUTTy has a chance to start
+09A8            147   
+09A8 9007A4     148     mov dptr, #InitialMessage
+09AB 120732     149            lcall SendString
+09AE            150   
+09AE C2A7       151     clr SOUND ; Disable speaker
+09B0 C2C8       152     clr TMOD20 ; Stop CCU timer
+09B2 D2AF       153            setb EA ; Enable global interrupts.
+09B4            154   
+09B4            155   forever:
+09B4 90080A     156     mov dptr, #Temp
+09B7 120732     157            lcall SendString
+09BA 12081A     158     lcall Read_Temperature
+09BD 9007F2     159     mov dptr, #Thermocouple
+09C0 120732     160            lcall SendString
+09C3 1208CF     161     lcall Get_Thermocouple
+09C6 12073D     162     lcall ADC_to_PB
+09C9 120885     163     lcall Display_PushButtons_ADC
+09CC 120683     164     lcall Wait1S
+09CF 2083E2     165     jb PLAY_BUTTON, forever
+09D2            166     ;Wait_Milli_Seconds(#50)
+09D2 2083DF     167     jb PLAY_BUTTON, forever
+09D5 3083FD     168     jnb PLAY_BUTTON, $
+09D8            169     ;mov 
+09D8 1203A7     170     lcall Play_Whole_Memory
+09DB 0209B4     171     ljmp forever
+09DE            172   
+09DE            173   en

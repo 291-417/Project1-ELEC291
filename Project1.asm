@@ -131,11 +131,12 @@ MainProgram:
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
   lcall Double_Clk
   lcall InitDAC ; Call after 'Ports_Init
-	lcall CCU_Init
-	lcall Init_SPI
+	
+  lcall CCU_Init
+  lcall Init_SPI
   
   lcall InitSerialPort
-	lcall InitADC0
+  lcall InitADC0
   lcall LCD_4BIT
 
   ; Set beginning message on LCD
@@ -152,15 +153,31 @@ MainProgram:
 	setb EA ; Enable global interrupts.
 
 forever:
+  mov dptr, #Temp
+	lcall SendString
   lcall Read_Temperature
+  mov dptr, #Thermocouple
+	lcall SendString
+  lcall Get_Thermocouple
   lcall ADC_to_PB
-	lcall Display_PushButtons_ADC
-	jb PLAY_BUTTON, forever
+	lcall Wait1S
+  jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
   ;mov 
+
   lcall Play_Whole_Memory
+
+	jb DIP_BUTTON1, next
+	Wait_Milli_Seconds(#50)	
+	jb DIP_BUTTON1, next
+	lcall Display_PushButtons_ADC
   ljmp forever
 
+
+next:
+	Set_Cursor(2, 1)
+    Send_Constant_String(#blank)
+    ljmp forever
 end
