@@ -20,7 +20,7 @@
 0000             22   LCD_D6 equ P1.4
 0000             23   LCD_D7 equ P1.6
 0000             24   
-0000             25   PLAY_BUTTON equ P3.0
+0000             25   PLAY_BUTTON equ P0.3
 0000             26   SOUND equ P2.7
 0000             27   
 0000             28   FLASH_CE    EQU P2.4
@@ -160,12 +160,55 @@
 0930 1207F2     155     lcall Read_Temperature
 0933 12073D     156     lcall ADC_to_PB
 0936 12085D     157            lcall Display_PushButtons_ADC
-0939 20B0F4     158            jb PLAY_BUTTON, forever
+0939 2083F4     158            jb PLAY_BUTTON, forever
 093C            159     ;Wait_Milli_Seconds(#50)
-093C 20B0F1     160     jb PLAY_BUTTON, forever
-093F 30B0FD     161     jnb PLAY_BUTTON, $
-0942            162     ;mov 
-0942 1203A7     163     lcall Play_Whole_Memory
-0945 020930     164     ljmp forever
-0948            165   
-0948            166   en
+093C 2083F1     160     jb PLAY_BUTTON, forever
+093F 3083FD     161     jnb PLAY_BUTTON, $
+0942 753030     162     mov w+0, #0x30
+0945 753123     163     mov w+1, #0x23
+0948 753200     164     mov w+2, #0x00
+094B 75404D     165     mov sound_start+0, #0x4d
+094E 754100     166     mov sound_start+1, #0x00
+0951 754200     167     mov sound_start+2, #0x00
+0954 120383     168     lcall Play_Segment
+0957 C002       169            push AR2
+0959 7AFF       169            mov R2, #255
+095B 1202D7     169            lcall ?Wait_Milli_Seconds
+095E D002       169            pop AR2
+0960 C002       170            push AR2
+0962 7AFF       170            mov R2, #255
+0964 1202D7     170            lcall ?Wait_Milli_Seconds
+0967 D002       170            pop AR2
+0969 C002       171            push AR2
+096B 7AFF       171            mov R2, #255
+096D 1202D7     171            lcall ?Wait_Milli_Seconds
+0970 D002       171            pop AR2
+0972            172     ;Wait_Milli_Seconds(#255)
+0972 754086     173     mov sound_start+0, #0x86
+0975 754101     174     mov sound_start+1, #0x01
+0978 754205     175     mov sound_start+2, #0x05
+097B 7530C8     176     mov w+0, #0xc8
+097E 75312A     177     mov w+1, #0x2a
+0981 120383     178     lcall Play_Segment
+0984 C002       179            push AR2
+0986 7AFF       179            mov R2, #255
+0988 1202D7     179            lcall ?Wait_Milli_Seconds
+098B D002       179            pop AR2
+098D C002       180            push AR2
+098F 7AFF       180            mov R2, #255
+0991 1202D7     180            lcall ?Wait_Milli_Seconds
+0994 D002       180            pop AR2
+0996 C002       181            push AR2
+0998 7AFF       181            mov R2, #255
+099A 1202D7     181            lcall ?Wait_Milli_Seconds
+099D D002       181            pop AR2
+099F 7540AB     182     mov sound_start+0, #0xab
+09A2 754199     183     mov sound_start+1, #0x99
+09A5 754201     184     mov sound_start+2, #0x01
+09A8 7530CC     185     mov w+0, #0xcc
+09AB 753131     186     mov w+1, #0x31
+09AE 753200     187     mov w+2, #0x00
+09B1 120383     188     lcall Play_Segment
+09B4 020930     189     ljmp forever
+09B7            190   
+09B7            191   en
