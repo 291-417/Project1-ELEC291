@@ -19,11 +19,10 @@ READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
 $include(obamaindex.inc)
-Play_Character:
-; Assumes that character is in BCD in lower four bits of accumulator
+Play_Numbered:
+; Assumes that character number is in accumulator
 	push ar0
-	push ar1
-	anl a, #0x0f ; just make sure that it's only the lower bits
+	;anl a, #0x0f ; just make sure that it's only the lower bits
 	setb c
 	subb a, #0 ; We're starting from zero so we need to subtract one
 	mov b, #3 ; Each row is three bytes
@@ -57,7 +56,6 @@ Play_Character:
 	movc a, @a+dptr
 	mov w+0, a
 	lcall Play_Segment
-	pop ar1
 	pop ar0
 	ret
 

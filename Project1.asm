@@ -171,12 +171,7 @@ next_check:
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
 
-  mov a, #1
-  lcall Play_Character
-  Wait_Milli_Seconds(#255)
-  mov a, #2
-  Wait_Milli_Seconds(#255)
-  mov a, #3
+  lcall Play_Sounds
   ljmp forever
 
 
@@ -184,4 +179,27 @@ next:
 	Set_Cursor(2, 1)
     Send_Constant_String(#blank)
     ljmp next_check
+
+Play_Sounds:
+  mov a, #2
+  lcall Play_Numbered
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+
+  mov a, #28
+  lcall Play_Numbered
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  
+  mov a, #11
+  lcall Play_Numbered
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  ret
 end
