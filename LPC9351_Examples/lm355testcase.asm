@@ -166,11 +166,11 @@ MainProgram:
 forever_loop:
 	; Take 256 (4^4) consecutive measurements of ADC0 channel 0 at about 10 us intervals and accumulate in x
 	Load_x(0)
-    mov x+0, AD0DAT0
+    mov x+0, AD0DAT1
 	mov R7, #255
     lcall Wait10us
 accumulate_loop:
-    mov y+0, AD0DAT0
+    mov y+0, AD0DAT1
     mov y+1, #0
     mov y+2, #0
     mov y+3, #0
@@ -183,7 +183,7 @@ accumulate_loop:
 	lcall div32
 	; x has now the 12-bit representation of the temperature
 	
-	; Convert to temperature (C)
+	;Conver to temperature (C)
 	Load_Y(33000) ; Vref is 3.3V
 	lcall mul32
 	Load_Y(((1<<12)-1)) ; 2^12-1
@@ -193,11 +193,16 @@ accumulate_loop:
 	
 	lcall hex2bcd
 	
+	
+	
 	mov	b, AD0DAT0
 	lcall SendHex
 	
 	lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
+	
+	mov a, #'\n'
+	lcall putChar
 	lcall Wait1S
 
-	sjmp forever_loop
+	ljmp forever_loop
 end

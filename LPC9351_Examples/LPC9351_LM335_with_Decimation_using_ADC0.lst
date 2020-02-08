@@ -13,7 +13,7 @@
 0000             15   BRVAL EQU ((XTAL/BAUD)-16)
 0000             16   
 0000             17            CSEG at 0x0000
-0000 020369      18            ljmp    MainProgram
+0000 020345      18            ljmp    MainProgram
 0003             19   
 0030             20   DSEG at 0x30
 0030             21   x:   ds 4
@@ -74,7 +74,7 @@
 02B8             77            ; Setup ADC0
 02B8 D2C2        78            setb BURST0 ; Autoscan continuos conversion mode
 02BA 75A120      79            mov     ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
-02BD 75A30F      80            mov     ADINS,#0x0F ; Select the four channels of ADC0 for conversion
+02BD 75A30F      80            mov     ADINS,#0x0f ; Select the four channels of ADC0 for conversion
 02C0 758E05      81            mov     ADCON0,#0x05 ; Enable the converter and start immediately
 02C3             82            ; Wait for first conversion to complete
 02C3             83   InitADC_L1:
@@ -129,30 +129,12 @@
 0318            129   SendString_L1:
 0318 22         130            ret
 0319            131   
-0319            132   SendHex:
-0319 7430       133            mov a, #'0'
-031B 120273     134            lcall putchar
-031E 7478       135            mov a, #'x'
-0320 120273     136            lcall putchar
-0323 9002C9     137            mov dptr, #HexAscii 
-0326 E5F0       138            mov a, b
-0328 C4         139            swap a
-0329 540F       140            anl a, #0xf
-032B 93         141            movc a, @a+dptr
-032C 120273     142            lcall putchar
-032F E5F0       143            mov a, b
-0331 540F       144            anl a, #0xf
-0333 93         145            movc a, @a+dptr
-0334 120273     146            lcall putchar
-0337 7420       147            mov a, #' '
-0339 120273     148            lcall putchar
-033C 22         149            ret
-033D            150   Wait10us:
-033D 7812       151       mov R0, #18
-033F D8FE       152       djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
-0341 22         153            ret
-0342            154   
-0342 0D0A5038   155   InitialMessage: db '\r\nP89LPC9351 ADC decimation example.\r\n', 0
+0319            132   Wait10us:
+0319 7812       133       mov R0, #18
+031B D8FE       134       djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
+031D 22         135            ret
+031E            136   
+031E 0D0A5038   137   InitialMessage: db '\r\nP89LPC9351 ADC decimation example.\r\n', 0
      394C5043
      39333531
      20414443
@@ -162,71 +144,58 @@
      6578616D
      706C652E
      0D0A00
-0369            156            
-0369            157   MainProgram:
-0369 75817F     158       mov SP, #0x7F
-036C 120290     159            lcall InitSerialPort
-036F 1202A6     160            lcall InitADC
-0372            161   
-0372 120283     162            lcall Wait1S ; Wait a bit so PUTTy has a chance to start
-0375 900342     163            mov dptr, #InitialMessage
-0378 12030E     164            lcall SendString
-037B            165   
-037B            166   forever_loop:
-037B            167            ; Take 256 (4^4) consecutive measurements of ADC0 channel 0 at about 10 us intervals and accumulate in x
-037B 753000     168            mov x+0, #low (0 % 0x10000) 
-037E 753100     168            mov x+1, #high(0 % 0x10000) 
-0381 753200     168            mov x+2, #low (0 / 0x10000) 
-0384 753300     168            mov x+3, #high(0 / 0x10000) 
-0387 85C630     169       mov x+0, AD0DAT1
-038A 7FFF       170            mov R7, #255
-038C 12033D     171       lcall Wait10us
-038F            172   accumulate_loop:
-038F 85C634     173       mov y+0, AD0DAT1
-0392 753500     174       mov y+1, #0
-0395 753600     175       mov y+2, #0
-0398 753700     176       mov y+3, #0
-039B 1200C8     177       lcall add32
-039E 12033D     178       lcall Wait10us
-03A1 DFEC       179            djnz R7, accumulate_loop
-03A3            180            
-03A3            181            ; Now divide by 16 (2^4)
-03A3 753410     182            mov y+0, #low (16 % 0x10000) 
-03A6 753500     182            mov y+1, #high(16 % 0x10000) 
-03A9 753600     182            mov y+2, #low (16 / 0x10000) 
-03AC 753700     182            mov y+3, #high(16 / 0x10000) 
-03AF 12020A     183            lcall div32
-03B2            184            ; x has now the 12-bit representation of the temperature
-03B2            185            
-03B2            186            ;Conver to temperature (C)
-03B2 7534E8     187            mov y+0, #low (33000 % 0x10000) 
-03B5 753580     187            mov y+1, #high(33000 % 0x10000) 
-03B8 753600     187            mov y+2, #low (33000 / 0x10000) 
-03BB 753700     187            mov y+3, #high(33000 / 0x10000)  ; Vref is 3.3V
-03BE 12017D     188            lcall mul32
-03C1 7534FF     189            mov y+0, #low (((1<<12)-1) % 0x10000) 
-03C4 75350F     189            mov y+1, #high(((1<<12)-1) % 0x10000) 
-03C7 753600     189            mov y+2, #low (((1<<12)-1) / 0x10000) 
-03CA 753700     189            mov y+3, #high(((1<<12)-1) / 0x10000)  ; 2^12-1
-03CD 12020A     190            lcall div32
-03D0 7534A4     191            mov y+0, #low (27300 % 0x10000) 
-03D3 75356A     191            mov y+1, #high(27300 % 0x10000) 
-03D6 753600     191            mov y+2, #low (27300 / 0x10000) 
-03D9 753700     191            mov y+3, #high(27300 / 0x10000) 
-03DC 1200E9     192            lcall sub32
-03DF            193            
-03DF 120003     194            lcall hex2bcd
-03E2            195            
-03E2            196            
-03E2            197            
-03E2 85C5F0     198            mov     b, AD0DAT0
-03E5 120319     199            lcall SendHex
-03E8            200            
-03E8 1202D9     201            lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
-03EB            202            
-03EB 740A       203            mov a, #'\n'
-03ED 120273     204            lcall putChar
-03F0 120283     205            lcall Wait1S
-03F3            206   
-03F3 02037B     207            ljmp forever_loop
-03F6            208   end
+0345            138            
+0345            139   MainProgram:
+0345 75817F     140       mov SP, #0x7F
+0348 120290     141            lcall InitSerialPort
+034B 1202A6     142            lcall InitADC
+034E            143   
+034E 120283     144            lcall Wait1S ; Wait a bit so PUTTy has a chance to start
+0351 90031E     145            mov dptr, #InitialMessage
+0354 12030E     146            lcall SendString
+0357            147   
+0357            148   forever_loop:
+0357            149            ; Take 256 (4^4) consecutive measurements of ADC0 channel 0 at about 10 us intervals and accumulate in x
+0357 753000     150            mov x+0, #low (0 % 0x10000) 
+035A 753100     150            mov x+1, #high(0 % 0x10000) 
+035D 753200     150            mov x+2, #low (0 / 0x10000) 
+0360 753300     150            mov x+3, #high(0 / 0x10000) 
+0363 85C530     151       mov x+0, AD0DAT0
+0366 7FFF       152            mov R7, #255
+0368 120319     153       lcall Wait10us
+036B            154   accumulate_loop:
+036B 85C534     155       mov y+0, AD0DAT0
+036E 753500     156       mov y+1, #0
+0371 753600     157       mov y+2, #0
+0374 753700     158       mov y+3, #0
+0377 1200C8     159       lcall add32
+037A 120319     160       lcall Wait10us
+037D DFEC       161            djnz R7, accumulate_loop
+037F            162            
+037F            163            ; Now divide by 16 (2^4)
+037F 753410     164            mov y+0, #low (16 % 0x10000) 
+0382 753500     164            mov y+1, #high(16 % 0x10000) 
+0385 753600     164            mov y+2, #low (16 / 0x10000) 
+0388 753700     164            mov y+3, #high(16 / 0x10000) 
+038B 12020A     165            lcall div32
+038E            166            ; x has now the 12-bit representation of the temperature
+038E            167            
+038E            168            ; Convert to temperature (C)
+038E 7534E8     169            mov y+0, #low (33000 % 0x10000) 
+0391 753580     169            mov y+1, #high(33000 % 0x10000) 
+0394 753600     169            mov y+2, #low (33000 / 0x10000) 
+0397 753700     169            mov y+3, #high(33000 / 0x10000)  ; Vref is 3.3V
+039A 12017D     170            lcall mul32
+039D 7534FF     171            mov y+0, #low (((1<<12)-1) % 0x10000) 
+03A0 75350F     171            mov y+1, #high(((1<<12)-1) % 0x10000) 
+03A3 753600     171            mov y+2, #low (((1<<12)-1) / 0x10000) 
+03A6 753700     171            mov y+3, #high(((1<<12)-1) / 0x10000)  ; 
+03A9 12020A     172            lcall div32
+03AC            173            
+03AC 120003     174            lcall hex2bcd
+03AF            175            
+03AF 1202D9     176            lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
+03B2 120283     177            lcall Wait1S
+03B5            178   
+03B5 80A0       179            sjmp forever_loop
+03B7            180   end

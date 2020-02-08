@@ -168,10 +168,8 @@ accumulate_loop:
 	; Convert to temperature (C)
 	Load_Y(33000) ; Vref is 3.3V
 	lcall mul32
-	Load_Y(((1<<12)-1)) ; 2^12-1
+	Load_Y(((1<<12)-1)) ; 
 	lcall div32
-	Load_Y(27300)
-	lcall sub32
 	
 	lcall hex2bcd
 	

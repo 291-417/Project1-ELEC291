@@ -278,7 +278,7 @@
 0000             14   BRVAL EQU ((XTAL/BAUD)-16)
 0000             15   
 0000             16   CSEG at 0x0000
-0000 0204F6      17   ljmp     MainProgram
+0000 020507      17   ljmp     MainProgram
 0003             18   
 0030             19   DSEG at 0x30
 0030             20   x:   ds 4
@@ -298,249 +298,250 @@
 0008             34   
 0003             35   cseg
 0003             36   ; These 'equ' must match the wiring between the microcontroller and the LCD!
-0003             37   LCD_RS equ P0.7
-0003             38   LCD_RW equ P3.0
-0003             39   LCD_E  equ P3.1
-0003             40   LCD_D4 equ P2.3
-0003             41   LCD_D5 equ P2.4
-0003             42   LCD_D6 equ P2.5
-0003             43   LCD_D7 equ P2.6
+0003             37   LCD_RS equ P0.5
+0003             38   LCD_RW equ P0.6
+0003             39   LCD_E  equ P0.7
+0003             40   LCD_D4 equ P1.2
+0003             41   LCD_D5 equ P1.3
+0003             42   LCD_D6 equ P1.4
+0003             43   LCD_D7 equ P1.6
+0003             44   BUTTON equ P3.0
                 546   $LIST
-                 46   $LIST
-0328             48   
+                 47   $LIST
 0328             49   
-0328             50   Wait10us:
-0328 7812        51       mov R0, #18
-032A D8FE        52       djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
-032C 22          53            ret
-032D             54   putchar:
-032D 109902      55            jbc     TI,putchar_L1
-0330 80FB        56            sjmp putchar
-0332             57   putchar_L1:
-0332 F599        58            mov     SBUF,a
-0334 22          59            ret
-0335             60            
-0335             61   getchar:
-0335 109802      62            jbc     RI,getchar_L1
-0338 80FB        63            sjmp getchar
-033A             64   getchar_L1:
-033A E599        65            mov     a,SBUF
-033C 22          66            ret
-033D             67   
-033D             68   Wait1S:
-033D 7A28        69            mov R2, #40
-033F 79FA        70   M3:      mov R1, #250
-0341 78B8        71   M2:      mov R0, #184
-0343 D8FE        72   M1:      djnz R0, M1 ; 2 machine cycles-> 2*0.27126us*184=100us
-0345 D9FA        73            djnz R1, M2 ; 100us*250=0.025s
-0347 DAF6        74            djnz R2, M3 ; 0.025s*40=1s
-0349 22          75            ret
-034A             76   
-034A             77   InitSerialPort:
-034A 75BD00      78            mov     BRGCON,#0x00
-034D 75BF00      79            mov     BRGR1,#high(BRVAL)
-0350 75BE30      80            mov     BRGR0,#low(BRVAL)
-0353 75BD03      81            mov     BRGCON,#0x03 ; Turn-on the baud rate generator
-0356 759852      82            mov     SCON,#0x52 ; Serial port in mode 1, ren, txrdy, rxempty
-0359 759100      83            mov     P1M1,#0x00 ; Enable pins RxD and TXD
-035C 759200      84            mov     P1M2,#0x00 ; Enable pins RxD and TXD
-035F 22          85            ret
-0360             86   
-0360             87   InitADC0:
-0360             88            ; ADC0_0 is connected to P1.7
-0360             89            ; ADC0_1 is connected to P0.0
-0360             90       ; Configure pins P1.7 and P0.0  as inputs
-0360 438401      91       orl P0M1, #00000001b
-0363 5385FE      92       anl P0M2, #11111110b
-0366 439180      93       orl P1M1, #10000000b
-0369 53927F      94       anl P1M2, #01111111b
-036C 43A403      95       orl P2M1, #00000011b
-036F 53A5FC      96       anl P2M2, #11111100b
-0372             97            ; Setup ADC0
-0372 D2C2        98            setb BURST0 ; Autoscan continuos conversion mode
-0374 75A120      99            mov     ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
-0377 75A30F     100            mov     ADINS,#0x0F ; Select four channels of ADC0 for conversion
-037A 758E05     101            mov     ADCON0,#0x05 ; Enable the converter and start immediately
-037D            102            ; Wait for first conversion to complete
-037D            103   InitADC0_L1:
-037D E58E       104            mov     a,ADCON0
-037F 30E3FB     105            jnb     acc.3,InitADC0_L1
-0382 22         106            ret
-0383            107   
-0383 30313233   108   HexAscii: db '0123456789ABCDEF'
+0328             50   
+0328             51   Wait10us:
+0328 7812        52       mov R0, #18
+032A D8FE        53       djnz R0, $ ; 2 machine cycles-> 2*0.27126us*18=10us
+032C 22          54            ret
+032D             55   putchar:
+032D 109902      56            jbc     TI,putchar_L1
+0330 80FB        57            sjmp putchar
+0332             58   putchar_L1:
+0332 F599        59            mov     SBUF,a
+0334 22          60            ret
+0335             61            
+0335             62   getchar:
+0335 109802      63            jbc     RI,getchar_L1
+0338 80FB        64            sjmp getchar
+033A             65   getchar_L1:
+033A E599        66            mov     a,SBUF
+033C 22          67            ret
+033D             68   
+033D             69   Wait1S:
+033D 7A28        70            mov R2, #40
+033F 79FA        71   M3:      mov R1, #250
+0341 78B8        72   M2:      mov R0, #184
+0343 D8FE        73   M1:      djnz R0, M1 ; 2 machine cycles-> 2*0.27126us*184=100us
+0345 D9FA        74            djnz R1, M2 ; 100us*250=0.025s
+0347 DAF6        75            djnz R2, M3 ; 0.025s*40=1s
+0349 22          76            ret
+034A             77   
+034A             78   InitSerialPort:
+034A 75BD00      79            mov     BRGCON,#0x00
+034D 75BF00      80            mov     BRGR1,#high(BRVAL)
+0350 75BE30      81            mov     BRGR0,#low(BRVAL)
+0353 75BD03      82            mov     BRGCON,#0x03 ; Turn-on the baud rate generator
+0356 759852      83            mov     SCON,#0x52 ; Serial port in mode 1, ren, txrdy, rxempty
+0359 759100      84            mov     P1M1,#0x00 ; Enable pins RxD and TXD
+035C 759200      85            mov     P1M2,#0x00 ; Enable pins RxD and TXD
+035F 22          86            ret
+0360             87   
+0360             88   InitADC0:
+0360             89            ; ADC0_0 is connected to P1.7
+0360             90            ; ADC0_1 is connected to P0.0
+0360             91       ; Configure pins P1.7 and P0.0  as inputs
+0360 438401      92       orl P0M1, #00000001b
+0363 5385FE      93       anl P0M2, #11111110b
+0366 439180      94       orl P1M1, #10000000b
+0369 53927F      95       anl P1M2, #01111111b
+036C 43A403      96       orl P2M1, #00000011b
+036F 53A5FC      97       anl P2M2, #11111100b
+0372             98            ; Setup ADC0
+0372 D2C2        99            setb BURST0 ; Autoscan continuos conversion mode
+0374 75A120     100            mov     ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
+0377 75A30F     101            mov     ADINS,#0x0F ; Select four channels of ADC0 for conversion
+037A 758E05     102            mov     ADCON0,#0x05 ; Enable the converter and start immediately
+037D            103            ; Wait for first conversion to complete
+037D            104   InitADC0_L1:
+037D E58E       105            mov     a,ADCON0
+037F 30E3FB     106            jnb     acc.3,InitADC0_L1
+0382 22         107            ret
+0383            108   
+0383 30313233   109   HexAscii: db '0123456789ABCDEF'
      34353637
      38394142
      43444546
-0393            109   SendTemp:
-0393 900383     110            mov dptr, #HexAscii 
-0396            111            
-0396 E539       112            mov a, bcd+1
-0398 C4         113            swap a
-0399 540F       114            anl a, #0xf
-039B 93         115            movc a, @a+dptr
-039C 12032D     116            lcall putchar
-039F E539       117            mov a, bcd+1
-03A1 540F       118            anl a, #0xf
-03A3 93         119            movc a, @a+dptr
-03A4 12032D     120            lcall putchar
-03A7            121   
-03A7 742E       122            mov a, #'.'
-03A9 12032D     123            lcall putchar
-03AC            124   
-03AC E538       125            mov a, bcd+0
-03AE C4         126            swap a
-03AF 540F       127            anl a, #0xf
-03B1 93         128            movc a, @a+dptr
-03B2 12032D     129            lcall putchar
-03B5 E538       130            mov a, bcd+0
-03B7 540F       131            anl a, #0xf
-03B9 93         132            movc a, @a+dptr
-03BA 12032D     133            lcall putchar
-03BD            134            
-03BD 740D       135            mov a, #'\r'
-03BF 12032D     136            lcall putchar
-03C2 740A       137            mov a, #'\n'
-03C4 12032D     138            lcall putchar   
-03C7 22         139            ret
-03C8            140            
-03C8            141   SendHex:
-03C8 7430       142            mov a, #'0'
-03CA 12032D     143            lcall putchar
-03CD 7478       144            mov a, #'x'
-03CF 12032D     145            lcall putchar
-03D2 900383     146            mov dptr, #HexAscii 
-03D5 E5F0       147            mov a, b
-03D7 C4         148            swap a
-03D8 540F       149            anl a, #0xf
-03DA 93         150            movc a, @a+dptr
-03DB 12032D     151            lcall putchar
-03DE E5F0       152            mov a, b
-03E0 540F       153            anl a, #0xf
-03E2 93         154            movc a, @a+dptr
-03E3 12032D     155            lcall putchar
-03E6 7420       156            mov a, #' '
-03E8 12032D     157            lcall putchar
-03EB 22         158            ret
-03EC            159            
-03EC            160   SendString:
-03EC E4         161       clr a
-03ED 93         162       movc a, @a+dptr
-03EE 6006       163       jz SendString_L1
-03F0 12032D     164       lcall putchar
-03F3 A3         165       inc dptr
-03F4 80F6       166       sjmp SendString  
-03F6            167   SendString_L1:
-03F6 22         168            ret
-03F7            169   
-03F7            170   ADC_to_PB:
-03F7 D207       171            setb PB6
-03F9 D206       172            setb PB5
-03FB D205       173            setb PB4
-03FD D204       174            setb PB3
-03FF D203       175            setb PB2
-0401 D202       176            setb PB1
-0403 D201       177            setb PB0
-0405            178            ; Check PB6
-0405 C3         179            clr c
-0406 E5C5       180            mov a, AD0DAT0
-0408 94C4       181            subb a, #(206-10) ; 2.8V=216*(3.3/255); the -10 is to prevent false readings
-040A 4003       182            jc ADC_to_PB_L6
-040C C207       183            clr PB6
-040E 22         184            ret
-040F            185   ADC_to_PB_L6:
-040F            186            ; Check PB5
-040F C3         187            clr c
-0410 E5C5       188            mov a, AD0DAT0
-0412 94AF       189            subb a, #(185-10) ; 2.4V=185*(3.3/255); the -10 is to prevent false readings
-0414 4003       190            jc ADC_to_PB_L5
-0416 C206       191            clr PB5
-0418 22         192            ret
-0419            193   ADC_to_PB_L5:
-0419            194            ; Check PB4
-0419 C3         195            clr c
-041A E5C5       196            mov a, AD0DAT0
-041C 9490       197            subb a, #(154-10) ; 2.0V=154*(3.3/255); the -10 is to prevent false readings
-041E 4003       198            jc ADC_to_PB_L4
-0420 C205       199            clr PB4
-0422 22         200            ret
-0423            201   ADC_to_PB_L4:
-0423            202            ; Check PB3
-0423 C3         203            clr c
-0424 E5C5       204            mov a, AD0DAT0
-0426 9471       205            subb a, #(123-10) ; 1.6V=123*(3.3/255); the -10 is to prevent false readings
-0428 4003       206            jc ADC_to_PB_L3
-042A C204       207            clr PB3
-042C 22         208            ret
-042D            209   ADC_to_PB_L3:
-042D            210            ; Check PB2
-042D C3         211            clr c
-042E E5C5       212            mov a, AD0DAT0
-0430 9452       213            subb a, #(92-10) ; 1.2V=92*(3.3/255); the -10 is to prevent false readings
-0432 4003       214            jc ADC_to_PB_L2
-0434 C203       215            clr PB2
-0436 22         216            ret
-0437            217   ADC_to_PB_L2:
-0437            218            ; Check PB1
-0437 C3         219            clr c
-0438 E5C5       220            mov a, AD0DAT0
-043A 9433       221            subb a, #(61-10) ; 0.8V=61*(3.3/255); the -10 is to prevent false readings
-043C 4003       222            jc ADC_to_PB_L1
-043E C202       223            clr PB1
-0440 22         224            ret
-0441            225   ADC_to_PB_L1:
-0441            226            ; Check PB1
-0441 C3         227            clr c
-0442 E5C5       228            mov a, AD0DAT0
-0444 9414       229            subb a, #(30-10) ; 0.4V=30*(3.3/255); the -10 is to prevent false readings
-0446 4003       230            jc ADC_to_PB_L0
-0448 C201       231            clr PB0
-044A 22         232            ret
-044B            233   ADC_to_PB_L0:
-044B            234            ; No pusbutton pressed  
-044B 22         235            ret
-044C            236   
-044C            237   Display_PushButtons_ADC:
-044C C0E0       238            push acc
-044E 7401       238            mov a, #1
-0450 14         238            dec a
-0451 12009B     238            lcall ?Set_Cursor_2 ; Select column and row
-0454 D0E0       238            pop acc
-0456 7430       239            mov a, #'0'
-0458 A207       240            mov c, PB6
-045A 3400       241            addc a, #0
-045C 120051     242       lcall ?WriteData     
-045F 7430       243            mov a, #'0'
-0461 A206       244            mov c, PB5
-0463 3400       245            addc a, #0
-0465 120051     246       lcall ?WriteData     
-0468 7430       247            mov a, #'0'
-046A A205       248            mov c, PB4
-046C 3400       249            addc a, #0
-046E 120051     250       lcall ?WriteData     
-0471 7430       251            mov a, #'0'
-0473 A204       252            mov c, PB3
-0475 3400       253            addc a, #0
-0477 120051     254       lcall ?WriteData     
-047A 7430       255            mov a, #'0'
-047C A203       256            mov c, PB2
-047E 3400       257            addc a, #0
-0480 120051     258       lcall ?WriteData     
-0483 7430       259            mov a, #'0'
-0485 A202       260            mov c, PB1
-0487 3400       261            addc a, #0
-0489 120051     262       lcall ?WriteData     
-048C 7430       263            mov a, #'0'
-048E A201       264            mov c, PB0
-0490 3400       265            addc a, #0
-0492 120051     266       lcall ?WriteData     
-0495 22         267            ret
-0496            268   
-0496 41444330   269   Title: db 'ADC0 push buttons', 0
+0393            110   SendTemp:
+0393 900383     111            mov dptr, #HexAscii 
+0396            112            
+0396 E539       113            mov a, bcd+1
+0398 C4         114            swap a
+0399 540F       115            anl a, #0xf
+039B 93         116            movc a, @a+dptr
+039C 12032D     117            lcall putchar
+039F E539       118            mov a, bcd+1
+03A1 540F       119            anl a, #0xf
+03A3 93         120            movc a, @a+dptr
+03A4 12032D     121            lcall putchar
+03A7            122   
+03A7 742E       123            mov a, #'.'
+03A9 12032D     124            lcall putchar
+03AC            125   
+03AC E538       126            mov a, bcd+0
+03AE C4         127            swap a
+03AF 540F       128            anl a, #0xf
+03B1 93         129            movc a, @a+dptr
+03B2 12032D     130            lcall putchar
+03B5 E538       131            mov a, bcd+0
+03B7 540F       132            anl a, #0xf
+03B9 93         133            movc a, @a+dptr
+03BA 12032D     134            lcall putchar
+03BD            135            
+03BD 740D       136            mov a, #'\r'
+03BF 12032D     137            lcall putchar
+03C2 740A       138            mov a, #'\n'
+03C4 12032D     139            lcall putchar   
+03C7 22         140            ret
+03C8            141            
+03C8            142   SendHex:
+03C8 7430       143            mov a, #'0'
+03CA 12032D     144            lcall putchar
+03CD 7478       145            mov a, #'x'
+03CF 12032D     146            lcall putchar
+03D2 900383     147            mov dptr, #HexAscii 
+03D5 E5F0       148            mov a, b
+03D7 C4         149            swap a
+03D8 540F       150            anl a, #0xf
+03DA 93         151            movc a, @a+dptr
+03DB 12032D     152            lcall putchar
+03DE E5F0       153            mov a, b
+03E0 540F       154            anl a, #0xf
+03E2 93         155            movc a, @a+dptr
+03E3 12032D     156            lcall putchar
+03E6 7420       157            mov a, #' '
+03E8 12032D     158            lcall putchar
+03EB 22         159            ret
+03EC            160            
+03EC            161   SendString:
+03EC E4         162       clr a
+03ED 93         163       movc a, @a+dptr
+03EE 6006       164       jz SendString_L1
+03F0 12032D     165       lcall putchar
+03F3 A3         166       inc dptr
+03F4 80F6       167       sjmp SendString  
+03F6            168   SendString_L1:
+03F6 22         169            ret
+03F7            170   
+03F7            171   ADC_to_PB:
+03F7 D207       172            setb PB6
+03F9 D206       173            setb PB5
+03FB D205       174            setb PB4
+03FD D204       175            setb PB3
+03FF D203       176            setb PB2
+0401 D202       177            setb PB1
+0403 D201       178            setb PB0
+0405            179            ; Check PB6
+0405 C3         180            clr c
+0406 E5C5       181            mov a, AD0DAT0
+0408 94C4       182            subb a, #(206-10) ; 2.8V=216*(3.3/255); the -10 is to prevent false readings
+040A 4003       183            jc ADC_to_PB_L6
+040C C207       184            clr PB6
+040E 22         185            ret
+040F            186   ADC_to_PB_L6:
+040F            187            ; Check PB5
+040F C3         188            clr c
+0410 E5C5       189            mov a, AD0DAT0
+0412 94AF       190            subb a, #(185-10) ; 2.4V=185*(3.3/255); the -10 is to prevent false readings
+0414 4003       191            jc ADC_to_PB_L5
+0416 C206       192            clr PB5
+0418 22         193            ret
+0419            194   ADC_to_PB_L5:
+0419            195            ; Check PB4
+0419 C3         196            clr c
+041A E5C5       197            mov a, AD0DAT0
+041C 9490       198            subb a, #(154-10) ; 2.0V=154*(3.3/255); the -10 is to prevent false readings
+041E 4003       199            jc ADC_to_PB_L4
+0420 C205       200            clr PB4
+0422 22         201            ret
+0423            202   ADC_to_PB_L4:
+0423            203            ; Check PB3
+0423 C3         204            clr c
+0424 E5C5       205            mov a, AD0DAT0
+0426 9471       206            subb a, #(123-10) ; 1.6V=123*(3.3/255); the -10 is to prevent false readings
+0428 4003       207            jc ADC_to_PB_L3
+042A C204       208            clr PB3
+042C 22         209            ret
+042D            210   ADC_to_PB_L3:
+042D            211            ; Check PB2
+042D C3         212            clr c
+042E E5C5       213            mov a, AD0DAT0
+0430 9452       214            subb a, #(92-10) ; 1.2V=92*(3.3/255); the -10 is to prevent false readings
+0432 4003       215            jc ADC_to_PB_L2
+0434 C203       216            clr PB2
+0436 22         217            ret
+0437            218   ADC_to_PB_L2:
+0437            219            ; Check PB1
+0437 C3         220            clr c
+0438 E5C5       221            mov a, AD0DAT0
+043A 9433       222            subb a, #(61-10) ; 0.8V=61*(3.3/255); the -10 is to prevent false readings
+043C 4003       223            jc ADC_to_PB_L1
+043E C202       224            clr PB1
+0440 22         225            ret
+0441            226   ADC_to_PB_L1:
+0441            227            ; Check PB1
+0441 C3         228            clr c
+0442 E5C5       229            mov a, AD0DAT0
+0444 9414       230            subb a, #(30-10) ; 0.4V=30*(3.3/255); the -10 is to prevent false readings
+0446 4003       231            jc ADC_to_PB_L0
+0448 C201       232            clr PB0
+044A 22         233            ret
+044B            234   ADC_to_PB_L0:
+044B            235            ; No pusbutton pressed  
+044B 22         236            ret
+044C            237   
+044C            238   Display_PushButtons_ADC:
+044C C0E0       239            push acc
+044E 7401       239            mov a, #1
+0450 14         239            dec a
+0451 12009B     239            lcall ?Set_Cursor_2 ; Select column and row
+0454 D0E0       239            pop acc
+0456 7430       240            mov a, #'0'
+0458 A207       241            mov c, PB6
+045A 3400       242            addc a, #0
+045C 120051     243       lcall ?WriteData     
+045F 7430       244            mov a, #'0'
+0461 A206       245            mov c, PB5
+0463 3400       246            addc a, #0
+0465 120051     247       lcall ?WriteData     
+0468 7430       248            mov a, #'0'
+046A A205       249            mov c, PB4
+046C 3400       250            addc a, #0
+046E 120051     251       lcall ?WriteData     
+0471 7430       252            mov a, #'0'
+0473 A204       253            mov c, PB3
+0475 3400       254            addc a, #0
+0477 120051     255       lcall ?WriteData     
+047A 7430       256            mov a, #'0'
+047C A203       257            mov c, PB2
+047E 3400       258            addc a, #0
+0480 120051     259       lcall ?WriteData     
+0483 7430       260            mov a, #'0'
+0485 A202       261            mov c, PB1
+0487 3400       262            addc a, #0
+0489 120051     263       lcall ?WriteData     
+048C 7430       264            mov a, #'0'
+048E A201       265            mov c, PB0
+0490 3400       266            addc a, #0
+0492 120051     267       lcall ?WriteData     
+0495 22         268            ret
+0496            269   
+0496 41444330   270   Title: db 'ADC0 push buttons', 0
      20707573
      68206275
      74746F6E
      7300
-04A8 0D0A4144   270   InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
+04A8 0D0A4144   271   InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
      43302070
      75736820
      62757474
@@ -560,105 +561,132 @@
      746F2050
      312E370D
      0A00
-04F6            271            
-04F6            272   MainProgram:
-04F6 75817F     273       mov SP, #0x7F
-04F9            274   
-04F9            275       ; Configure all the ports in bidirectional mode:
-04F9 758400     276       mov P0M1, #00H
-04FC 758500     277       mov P0M2, #00H
-04FF 759100     278       mov P1M1, #00H
-0502 759200     279       mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1kohm pull-up resistors!
-0505 75A400     280       mov P2M1, #00H
-0508 75A500     281       mov P2M2, #00H
-050B 75B100     282       mov P3M1, #00H
-050E 75B200     283       mov P3M2, #00H
-0511            284            
-0511 12034A     285            lcall InitSerialPort
-0514 120360     286            lcall InitADC0
-0517            287            
-0517 12005B     288       lcall LCD_4BIT
-051A            289       ; For convenience a few handy macros are included in 'LCD_4bit_LPC9351.inc':
-051A C0E0       290            push acc
-051C 7401       290            mov a, #1
-051E 14         290            dec a
-051F 12009D     290            lcall ?Set_Cursor_1 ; Select column and row
-0522 D0E0       290            pop acc
-0524 C083       291            push dph
-0526 C082       291            push dpl
-0528 C0E0       291            push acc
-052A 900496     291            mov dptr, #Title
-052D 120090     291            lcall ?Send_Constant_String
-0530 D0E0       291            pop acc
-0532 D082       291            pop dpl
-0534 D083       291            pop dph
-0536            292   
-0536 12033D     293            lcall Wait1S ; Wait a bit so PUTTy has a chance to start
-0539 9004A8     294            mov dptr, #InitialMessage
-053C 1203EC     295            lcall SendString
-053F            296   
-053F            297   forever_loop:
-053F            298       ; Send the conversion results via the serial port to putty.
-053F 740D       299            mov a, #'\r' ; move cursor all the way to the left
-0541 12032D     300       lcall putchar
-0544            301       ; Display converted value from P1.7
-0544 85C5F0     302            mov     b, AD0DAT0
-0547 1203C8     303            lcall SendHex
-054A            304            
-054A 85C6F0     305            mov     b, AD0DAT1
-054D 1203C8     306            lcall SendHex
-0550            307            
-0550            308            
-0550 753000     309            mov x+0, #low (0 % 0x10000) 
-0553 753100     309            mov x+1, #high(0 % 0x10000) 
-0556 753200     309            mov x+2, #low (0 / 0x10000) 
-0559 753300     309            mov x+3, #high(0 / 0x10000) 
-055C 85C630     310       mov x+0, AD0DAT1
-055F 7FFF       311            mov R7, #255
-0561 120328     312       lcall Wait10us
-0564            313   accumulate_loop:
-0564 85C634     314       mov y+0, AD0DAT1
-0567 753500     315       mov y+1, #0
-056A 753600     316       mov y+2, #0
-056D 753700     317       mov y+3, #0
-0570 12017D     318       lcall add32
-0573 120328     319       lcall Wait10us
-0576 DFEC       320            djnz R7, accumulate_loop
-0578            321            
-0578            322            ; Now divide by 16 (2^4)
-0578 753410     323            mov y+0, #low (16 % 0x10000) 
-057B 753500     323            mov y+1, #high(16 % 0x10000) 
-057E 753600     323            mov y+2, #low (16 / 0x10000) 
-0581 753700     323            mov y+3, #high(16 / 0x10000) 
-0584 1202BF     324            lcall div32
-0587            325            ; x has now the 12-bit representation of the temperature
-0587            326            
-0587            327            ; Convert to temperature (C)
-0587 7534F8     328            mov y+0, #low (43000 % 0x10000) 
-058A 7535A7     328            mov y+1, #high(43000 % 0x10000) 
-058D 753600     328            mov y+2, #low (43000 / 0x10000) 
-0590 753700     328            mov y+3, #high(43000 / 0x10000)  ; Vref is 3.3V
-0593 120232     329            lcall mul32
-0596 7534FF     330            mov y+0, #low (((1<<12)-1) % 0x10000) 
-0599 75350F     330            mov y+1, #high(((1<<12)-1) % 0x10000) 
-059C 753600     330            mov y+2, #low (((1<<12)-1) / 0x10000) 
-059F 753700     330            mov y+3, #high(((1<<12)-1) / 0x10000)  ; 2^12-1
-05A2 1202BF     331            lcall div32
-05A5 7534A4     332            mov y+0, #low (27300 % 0x10000) 
-05A8 75356A     332            mov y+1, #high(27300 % 0x10000) 
-05AB 753600     332            mov y+2, #low (27300 / 0x10000) 
-05AE 753700     332            mov y+3, #high(27300 / 0x10000) 
-05B1 12019E     333            lcall sub32
-05B4            334            
-05B4 1200B8     335            lcall hex2bcd
-05B7            336            
-05B7 120393     337            lcall SendTemp 
-05BA            338            
-05BA 1203F7     339            lcall ADC_to_PB
-05BD 12044C     340            lcall Display_PushButtons_ADC
-05C0 12033D     341            lcall Wait1S
-05C3            342            
-05C3 02053F     343            ljmp forever_loop
-05C6            344   
-05C6            345   
-05C6            346   end
+04F6 20202020   272   blank: db '                ', 0
+     20202020
+     20202020
+     20202020
+     00
+0507            273   MainProgram:
+0507 75817F     274       mov SP, #0x7F
+050A            275   
+050A            276       ; Configure all the ports in bidirectional mode:
+050A 758400     277       mov P0M1, #00H
+050D 758500     278       mov P0M2, #00H
+0510 759100     279       mov P1M1, #00H
+0513 759200     280       mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1kohm pull-up resistors!
+0516 75A400     281       mov P2M1, #00H
+0519 75A500     282       mov P2M2, #00H
+051C 75B100     283       mov P3M1, #00H
+051F 75B200     284       mov P3M2, #00H
+0522            285            
+0522 12034A     286            lcall InitSerialPort
+0525 120360     287            lcall InitADC0
+0528            288            
+0528 12005B     289       lcall LCD_4BIT
+052B            290       ; For convenience a few handy macros are included in 'LCD_4bit_LPC9351.inc':
+052B C0E0       291            push acc
+052D 7401       291            mov a, #1
+052F 14         291            dec a
+0530 12009D     291            lcall ?Set_Cursor_1 ; Select column and row
+0533 D0E0       291            pop acc
+0535 C083       292            push dph
+0537 C082       292            push dpl
+0539 C0E0       292            push acc
+053B 900496     292            mov dptr, #Title
+053E 120090     292            lcall ?Send_Constant_String
+0541 D0E0       292            pop acc
+0543 D082       292            pop dpl
+0545 D083       292            pop dph
+0547            293   
+0547 12033D     294            lcall Wait1S ; Wait a bit so PUTTy has a chance to start
+054A 9004A8     295            mov dptr, #InitialMessage
+054D 1203EC     296            lcall SendString
+0550            297   
+0550            298   forever_loop:
+0550            299       ; Send the conversion results via the serial port to putty.
+0550 740D       300            mov a, #'\r' ; move cursor all the way to the left
+0552 12032D     301       lcall putchar
+0555            302       ; Display converted value from P1.7
+0555 85C5F0     303            mov     b, AD0DAT0
+0558 1203C8     304            lcall SendHex
+055B            305            
+055B 85C6F0     306            mov     b, AD0DAT1
+055E 1203C8     307            lcall SendHex
+0561            308            
+0561            309            
+0561 753000     310            mov x+0, #low (0 % 0x10000) 
+0564 753100     310            mov x+1, #high(0 % 0x10000) 
+0567 753200     310            mov x+2, #low (0 / 0x10000) 
+056A 753300     310            mov x+3, #high(0 / 0x10000) 
+056D 85C630     311       mov x+0, AD0DAT1
+0570 7FFF       312            mov R7, #255
+0572 120328     313       lcall Wait10us
+0575            314   accumulate_loop:
+0575 85C634     315       mov y+0, AD0DAT1
+0578 753500     316       mov y+1, #0
+057B 753600     317       mov y+2, #0
+057E 753700     318       mov y+3, #0
+0581 12017D     319       lcall add32
+0584 120328     320       lcall Wait10us
+0587 DFEC       321            djnz R7, accumulate_loop
+0589            322            
+0589            323            ; Now divide by 16 (2^4)
+0589 753410     324            mov y+0, #low (16 % 0x10000) 
+058C 753500     324            mov y+1, #high(16 % 0x10000) 
+058F 753600     324            mov y+2, #low (16 / 0x10000) 
+0592 753700     324            mov y+3, #high(16 / 0x10000) 
+0595 1202BF     325            lcall div32
+0598            326            ; x has now the 12-bit representation of the temperature
+0598            327            
+0598            328            ; Convert to temperature (C)
+0598 7534F8     329            mov y+0, #low (43000 % 0x10000) 
+059B 7535A7     329            mov y+1, #high(43000 % 0x10000) 
+059E 753600     329            mov y+2, #low (43000 / 0x10000) 
+05A1 753700     329            mov y+3, #high(43000 / 0x10000)  ; Vref is 3.3V
+05A4 120232     330            lcall mul32
+05A7 7534FF     331            mov y+0, #low (((1<<12)-1) % 0x10000) 
+05AA 75350F     331            mov y+1, #high(((1<<12)-1) % 0x10000) 
+05AD 753600     331            mov y+2, #low (((1<<12)-1) / 0x10000) 
+05B0 753700     331            mov y+3, #high(((1<<12)-1) / 0x10000)  ; 2^12-1
+05B3 1202BF     332            lcall div32
+05B6 7534A4     333            mov y+0, #low (27300 % 0x10000) 
+05B9 75356A     333            mov y+1, #high(27300 % 0x10000) 
+05BC 753600     333            mov y+2, #low (27300 / 0x10000) 
+05BF 753700     333            mov y+3, #high(27300 / 0x10000) 
+05C2 12019E     334            lcall sub32
+05C5            335            
+05C5 1200B8     336            lcall hex2bcd
+05C8            337            
+05C8 120393     338            lcall SendTemp 
+05CB            339            
+05CB 1203F7     340            lcall ADC_to_PB
+05CE            341            
+05CE 20B012     342            jb BUTTON, next
+05D1 C002       343            push AR2
+05D3 7A32       343            mov R2, #50
+05D5 12000C     343            lcall ?Wait_Milli_Seconds
+05D8 D002       343            pop AR2         
+05DA 20B006     344            jb BUTTON, next
+05DD 12044C     345            lcall Display_PushButtons_ADC
+05E0            346            
+05E0            347   
+05E0            348            
+05E0 020550     349            ljmp forever_loop
+05E3            350   
+05E3            351   next:
+05E3 C0E0       352            push acc
+05E5 7401       352            mov a, #1
+05E7 14         352            dec a
+05E8 12009B     352            lcall ?Set_Cursor_2 ; Select column and row
+05EB D0E0       352            pop acc
+05ED C083       353            push dph
+05EF C082       353            push dpl
+05F1 C0E0       353            push acc
+05F3 9004F6     353            mov dptr, #blank
+05F6 120090     353            lcall ?Send_Constant_String
+05F9 D0E0       353            pop acc
+05FB D082       353            pop dpl
+05FD D083       353            pop dph
+05FF 020550     354       ljmp forever_loop
+0602            355   
+0602            356   end

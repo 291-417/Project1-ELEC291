@@ -34,13 +34,14 @@ PB6: dbit 1 ; Variable to store the state of pushbutton 6 after calling ADC_to_P
 
 cseg
 ; These 'equ' must match the wiring between the microcontroller and the LCD!
-LCD_RS equ P0.7
-LCD_RW equ P3.0
-LCD_E  equ P3.1
-LCD_D4 equ P2.3
-LCD_D5 equ P2.4
-LCD_D6 equ P2.5
-LCD_D7 equ P2.6
+LCD_RS equ P0.5
+LCD_RW equ P0.6
+LCD_E  equ P0.7
+LCD_D4 equ P1.2
+LCD_D5 equ P1.3
+LCD_D6 equ P1.4
+LCD_D7 equ P1.6
+BUTTON equ P3.0
 $NOLIST
 $include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
 $INCLUDE(math32.inc)
@@ -268,7 +269,7 @@ Display_PushButtons_ADC:
 
 Title: db 'ADC0 push buttons', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
-	
+blank: db '                ', 0
 MainProgram:
     mov SP, #0x7F
 
@@ -337,10 +338,19 @@ accumulate_loop:
 	lcall SendTemp 
 	
 	lcall ADC_to_PB
+	
+	jb BUTTON, next
+	Wait_Milli_Seconds(#50)	
+	jb BUTTON, next
 	lcall Display_PushButtons_ADC
-	lcall Wait1S
+	
+
 	
 	ljmp forever_loop
 
+next:
+	Set_Cursor(2, 1)
+    Send_Constant_String(#blank)
+    ljmp forever_loop
 
 end
