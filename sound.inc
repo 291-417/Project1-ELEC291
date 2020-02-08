@@ -18,6 +18,36 @@ ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
 READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
+Play_Segment:
+; Play segment of memory
+; Parameters:
+;   in w, set how many bytes to play
+;   in sound_start, set where to start playing
+	clr TMOD20 ; Stop the CCU from playing previous request
+	setb FLASH_CE
+	
+	clr FLASH_CE ; Enable SPI Flash
+	mov a, #READ_BYTES
+	lcall Send_SPI
+	; Set the initial position in memory where to start playing
+	mov a, sound_start+2
+	lcall Send_SPI
+	mov a, sound_start+1
+	lcall Send_SPI
+	mov a, sound_start+0
+	lcall Send_SPI
+	; How many bytes to play? Should already be set
+	;mov w+2, #0x3f
+	;mov w+1, #0xff
+	;mov w+0, #0x00
+	
+	mov a, #0x00 ; Request first byte to send to DAC
+	lcall Send_SPI
+	
+	setb SOUND
+	setb TMOD20 ; Start playback by enabling CCU timer
+  ret
+
 Play_Whole_Memory:
 ; Play the whole memory
 	clr TMOD20 ; Stop the CCU from playing previous request
@@ -41,6 +71,7 @@ Play_Whole_Memory:
 	mov a, #0x00 ; Request first byte to send to DAC
 	lcall Send_SPI
 	
+	setb SOUND
 	setb TMOD20 ; Start playback by enabling CCU timer
   ret
 
@@ -97,6 +128,7 @@ keep_playing:
 
 stop_playing:
 	clr TMOD20 ; Stop CCU timer
+	clr SOUND
 	setb FLASH_CE  ; Disable SPI Flash
 
 CCU_ISR_Done:	

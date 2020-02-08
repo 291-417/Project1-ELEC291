@@ -14,15 +14,16 @@ BAUD        EQU 115200
 BRVAL       EQU ((CLK/BAUD)-16)
 XTAL        EQU 7373000
 
-;LCD_RS equ P1.6
-;LCD_RW equ P1.4
-;LCD_E  equ P1.3
-;LCD_D4 equ P0.7
-;LCD_D5 equ P0.6
-;LCD_D6 equ P0.5
-;LCD_D7 equ P0.3
+LCD_RS equ P0.5
+LCD_RW equ P0.6
+LCD_E  equ P0.7
+LCD_D4 equ P1.2
+LCD_D5 equ P1.3
+LCD_D6 equ P1.4
+LCD_D7 equ P1.6
 
 PLAY_BUTTON equ P3.0
+SOUND equ P2.7
 
 FLASH_CE    EQU P2.4
 
@@ -31,6 +32,7 @@ dseg at 30H
   x:   ds 4
   y:   ds 4
   bcd: ds 5
+  sound_start: ds 3
  
 bseg
 
@@ -70,7 +72,7 @@ org 0x005b ; CCU interrupt vector.  Used in this code to replay the wave file.
 
 $NOLIST
 $INCLUDE(math32.inc)
-;$include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
+$include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
 $include(sound.inc)
 $include(temppb.inc)
 $LIST
@@ -99,9 +101,33 @@ Ports_Init:
     mov P3M2, #00H
 	ret
 
+; Display a 3-digit BCD number in the LCD
+LCD_3BCD:
+	mov a, bcd+1
+	anl a, #0x0f
+	orl a, #'0'
+	lcall ?WriteData
+	mov a, bcd+0
+	swap a
+	anl a, #0x0f
+	orl a, #'0'
+	lcall ?WriteData
+	mov a, bcd+0
+	anl a, #0x0f
+	orl a, #'0'
+	lcall ?WriteData
+	ret
+
+Sound_Start_Init:
+  mov sound_start+0, #0xff
+  mov sound_start+1, #0x00
+  mov sound_start+2, #0x00
+  ret
+
 MainProgram:
   mov SP, #0x7F
   
+  lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
   lcall Double_Clk
   lcall InitDAC ; Call after 'Ports_Init
@@ -110,28 +136,30 @@ MainProgram:
   
   lcall InitSerialPort
 	lcall InitADC0
-  ;lcall LCD_4BIT
+  lcall LCD_4BIT
 
   ; Set beginning message on LCD
-  ;Set_Cursor(1, 1)
-  ;Send_Constant_String(#Title)
+  Set_Cursor(1, 1)
+  Send_Constant_String(#Title)
 
   lcall Wait1S ; Wait a bit so PUTTy has a chance to start
 
   mov dptr, #InitialMessage
 	lcall SendString
 
+  clr SOUND ; Disable speaker
   clr TMOD20 ; Stop CCU timer
 	setb EA ; Enable global interrupts.
 
 forever:
   lcall Read_Temperature
   lcall ADC_to_PB
-	;lcall Display_PushButtons_ADC
+	lcall Display_PushButtons_ADC
 	jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
+  ;mov 
   lcall Play_Whole_Memory
   ljmp forever
 

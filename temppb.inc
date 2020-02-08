@@ -212,7 +212,7 @@ accumulate_loop:
 	; x has now the 12-bit representation of the temperature
 	
 	; Convert to temperature (C)
-	Load_y(43000) ; Vref is 4.3V
+	Load_y(33000) ; Vref is 4.3V
 	lcall mul32
 	Load_y(((1<<12)-1)) ; 2^12-1
 	lcall div32
@@ -223,4 +223,36 @@ accumulate_loop:
 	
 	lcall SendTemp 
   ret
+
+Display_PushButtons_ADC:
+	Set_Cursor(2, 1)
+	mov a, #'0'
+	mov c, PB6
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB5
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB4
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB3
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB2
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB1
+	addc a, #0
+    lcall ?WriteData	
+	mov a, #'0'
+	mov c, PB0
+	addc a, #0
+    lcall ?WriteData	
+	ret
 end
