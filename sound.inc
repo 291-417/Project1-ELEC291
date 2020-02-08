@@ -18,6 +18,17 @@ ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
 READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
+
+Play_Character:
+; Assumes that character is in BCD in lower four bits of accumulator
+	push r0
+	anl a, #0x0f ; just make sure that it's only the lower bits
+	mov r0, a
+	add a, #sound_start
+
+	pop r0
+	ret
+
 Play_Segment:
 ; Play segment of memory
 ; Parameters:

@@ -161,23 +161,47 @@ forever:
   lcall Get_Thermocouple
   lcall ADC_to_PB
 	lcall Wait1S
+	jb BUTTON, next
+	Wait_Milli_Seconds(#50)	
+	jb BUTTON, next
+	lcall Display_PushButtons_ADC
+next_check:
   jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   jb PLAY_BUTTON, forever
   jnb PLAY_BUTTON, $
-  ;mov 
-
-  lcall Play_Whole_Memory
-
-	jb DIP_BUTTON1, next
-	Wait_Milli_Seconds(#50)	
-	jb DIP_BUTTON1, next
-	lcall Display_PushButtons_ADC
+  mov w+0, #0x30
+  mov w+1, #0x23
+  mov w+2, #0x00
+  mov sound_start+0, #0x4d
+  mov sound_start+1, #0x00
+  mov sound_start+2, #0x00
+  lcall Play_Segment
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  ;Wait_Milli_Seconds(#255)
+  mov sound_start+0, #0x86
+  mov sound_start+1, #0x01
+  mov sound_start+2, #0x05
+  mov w+0, #0xc8
+  mov w+1, #0x2a
+  lcall Play_Segment
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  mov sound_start+0, #0xab
+  mov sound_start+1, #0x99
+  mov sound_start+2, #0x01
+  mov w+0, #0xcc
+  mov w+1, #0x31
+  mov w+2, #0x00
+  lcall Play_Segment
   ljmp forever
 
 
 next:
 	Set_Cursor(2, 1)
     Send_Constant_String(#blank)
-    ljmp forever
+    ljmp next_check
 end
