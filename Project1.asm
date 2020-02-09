@@ -152,7 +152,7 @@ MainProgram:
   lcall Init_SPI
 
   ;lcall Timer0_Init
-  ;lcall Timer1_Init
+  lcall Timer1_Init
   
   lcall InitSerialPort
   lcall InitADC0
@@ -174,10 +174,10 @@ MainProgram:
 forever:
   mov dptr, #Temp
 	lcall SendString
-  lcall Read_Temperature
+  
   mov dptr, #Thermocouple
 	lcall SendString
-  lcall Get_Thermocouple
+  
   mov dptr, #Total
   lcall SendString
   lcall get_total_temp
@@ -194,7 +194,9 @@ forever:
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever
   ;jnb PLAY_BUTTON, $
-
+  lcall Get_Thermocouple
+  lcall Read_Temperature
+  jb second_flag, Every_Second_Stuff
   ;lcall Play_Sounds
   ljmp forever
 
@@ -203,6 +205,16 @@ forever:
 	;Set_Cursor(2, 1)
     ;Send_Constant_String(#blank)
     ;ljmp next_check
+Every_Second_Stuff:
+  
+  inc state_time
+  inc overall_time+0
+  mov a, overall_time+0
+  jnz End_Every_Second
+increment_upper_seconds:
+  inc overall_time+1
+End_Every_Second:
+  ljmp forever
 
 Play_Sounds:
   ;mov a, #2
