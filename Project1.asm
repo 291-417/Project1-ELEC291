@@ -35,13 +35,11 @@ dseg at 30H
   y:   ds 4
   bcd: ds 5
   sound_start: ds 3
-  t0_reload_big: ds 1
-  t0_reload_small: ds 1
   pwm_percentage: ds 1
   state: ds 1
   overall_time: ds 2
   state_time: ds 2
- 
+  pwm_counter: ds 1
 bseg
 
 mf: dbit 1
@@ -171,7 +169,7 @@ forever:
 	lcall SendString
   lcall Get_Thermocouple
   lcall ADC_to_PB
-	lcall Wait1S
+	;lcall Wait1S
 	jb DIP_BUTTON1, next
 	Wait_Milli_Seconds(#50)	
 	jb DIP_BUTTON1, next
@@ -192,31 +190,54 @@ next:
     ljmp next_check
 
 Play_Sounds:
-  mov a, #2
-  lcall Play_Numbered
+  ;mov a, #2
+  ;lcall Play_Numbered
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
-  mov pwm_percentage, #8
-  lcall Update_PWM_Percentages
+  ;Set_PWM_Percentage(#80)
 
-  mov a, #28
-  lcall Play_Numbered
+  ;mov a, #28
+  ;lcall Play_Numbered
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
-  ;mov pwm_percentage, #2
-  ;lcall Update_PWM_Percentages
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Set_PWM_Percentage(#100)
   
-  mov a, #11
-  lcall Play_Numbered
+  ;mov a, #11
+  ;lcall Play_Numbered
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
-  mov pwm_percentage, #5
-  lcall Update_PWM_Percentages
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  ;Set_PWM_Percentage(#0)
+
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  Wait_Milli_Seconds(#255)
+  ;Set_PWM_Percentage(#DEFAULT_PWM)
   ret
 end
