@@ -42,8 +42,6 @@ dseg at 30H
   lmtemp: ds 4
   thermotemp: ds 4
   totaltemp: ds 4
- 
-  state_time: ds 2
   pwm_counter: ds 1
 bseg
 
@@ -87,7 +85,7 @@ $include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility 
 $include(sound.inc)
 $include(temppb.inc)
 $include(pwm.inc)
-;$include(fsm.inc)
+$include(fsm.inc)
 $LIST
 
 ;---------------------------------;
@@ -177,26 +175,28 @@ forever:
   mov dptr, #Total
   lcall SendString
   lcall get_total_temp
-  lcall ADC_to_PB
+  ;lcall ADC_to_PB
+  lcall fsm_update
+  lcall update_lcd
 	;lcall Wait1S
-	jb DIP_BUTTON1, next
-	Wait_Milli_Seconds(#50)	
-	jb DIP_BUTTON1, next
-	lcall Display_PushButtons_ADC
-next_check:
-  jb PLAY_BUTTON, forever
+	;jb DIP_BUTTON1, next
+	;Wait_Milli_Seconds(#50)	
+	;jb DIP_BUTTON1, next
+	;lcall Display_PushButtons_ADC
+;next_check:
+  ;jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
-  jb PLAY_BUTTON, forever
-  jnb PLAY_BUTTON, $
+  ;jb PLAY_BUTTON, forever
+  ;jnb PLAY_BUTTON, $
 
-  lcall Play_Sounds
+  ;lcall Play_Sounds
   ljmp forever
 
 
-next:
-	Set_Cursor(2, 1)
-    Send_Constant_String(#blank)
-    ljmp next_check
+;next:
+	;Set_Cursor(2, 1)
+    ;Send_Constant_String(#blank)
+    ;ljmp next_check
 
 Play_Sounds:
   ;mov a, #2
