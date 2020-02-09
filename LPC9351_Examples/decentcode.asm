@@ -307,11 +307,11 @@ forever_loop:
 	
 	; lm355 measurement starts here
 	Load_x(0)
-    mov x+0, AD0DAT1
+    mov x+0, AD0DAT3
 	mov R7, #255
     lcall Wait10us
 accumulate_loop:
-    mov y+0, AD0DAT1
+    mov y+0, AD0DAT3
     mov y+1, #0
     mov y+2, #0
     mov y+3, #0
@@ -325,12 +325,11 @@ accumulate_loop:
 	; x has now the 12-bit representation of the temperature
 	
 	; Convert to temperature (C)
-	Load_Y(33000) ; Vref is 4.3V
+	Load_Y(33000) ; Vref is 3.3V
 	lcall mul32
 	Load_Y(((1<<12)-1)) ; 2^12-1
+	
 	lcall div32
-	Load_Y(27300)
-	lcall sub32
 	
 	lcall hex2bcd
 	

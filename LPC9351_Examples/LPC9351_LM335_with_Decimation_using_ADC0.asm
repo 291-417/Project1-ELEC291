@@ -77,7 +77,7 @@ InitADC:
 	; Setup ADC0
 	setb BURST0 ; Autoscan continuos conversion mode
 	mov	ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
-	mov	ADINS,#0x0f ; Select the four channels of ADC0 for conversion
+	mov	ADINS,#0x0B ; Select the four channels of ADC0 for conversion
 	mov	ADCON0,#0x05 ; Enable the converter and start immediately
 	; Wait for first conversion to complete
 InitADC_L1:
@@ -148,11 +148,11 @@ MainProgram:
 forever_loop:
 	; Take 256 (4^4) consecutive measurements of ADC0 channel 0 at about 10 us intervals and accumulate in x
 	Load_x(0)
-    mov x+0, AD0DAT0
+    mov x+0, AD0DAT3
 	mov R7, #255
     lcall Wait10us
 accumulate_loop:
-    mov y+0, AD0DAT0
+    mov y+0, AD0DAT3
     mov y+1, #0
     mov y+2, #0
     mov y+3, #0
@@ -174,7 +174,41 @@ accumulate_loop:
 	lcall hex2bcd
 	
 	lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
+	lcall lmtemp
 	lcall Wait1S
 
 	sjmp forever_loop
+
+lmtemp:
+	; Take 256 (4^4) consecutive measurements of ADC0 channel 0 at about 10 us intervals and accumulate in x
+	Load_x(0)
+    mov x+0, AD0DAT1
+	mov R7, #255
+    lcall Wait10us
+accumulate_loop1:
+    mov y+0, AD0DAT1
+    mov y+1, #0
+    mov y+2, #0
+    mov y+3, #0
+    lcall add32
+    lcall Wait10us
+	djnz R7, accumulate_loop1
+	
+	
+	; Now divide by 16 (2^4)
+	Load_Y(16)
+	lcall div32
+	; x has now the 12-bit representation of the temperature
+	
+	; Convert to temperature (C)
+	Load_Y(33000) ; Vref is 3.3V
+	lcall mul32
+	Load_Y(((1<<12)-1)) ; 
+	lcall div32
+	load_Y(27300)
+	lcall sub32
+	lcall hex2bcd
+	lcall SendTemp 
+	ret
+	
 end

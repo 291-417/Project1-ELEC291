@@ -40,7 +40,10 @@ dseg at 30H
   pwm_percentage: ds 1
   state: ds 1
   overall_time: ds 2
-  state_time: ds 2
+  state_time: ds 1
+  lmtemp: ds 4
+  thermotemp: ds 4
+  totaltemp: ds 4
  
 bseg
 
@@ -84,6 +87,7 @@ $include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility 
 $include(sound.inc)
 $include(temppb.inc)
 $include(pwm.inc)
+;$include(fsm.inc)
 $LIST
 
 ;---------------------------------;
@@ -170,6 +174,9 @@ forever:
   mov dptr, #Thermocouple
 	lcall SendString
   lcall Get_Thermocouple
+  mov dptr, #Total
+  lcall SendString
+  lcall get_total_temp
   lcall ADC_to_PB
 	lcall Wait1S
 	jb DIP_BUTTON1, next

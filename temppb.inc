@@ -50,7 +50,7 @@ InitADC0:
 	; Setup ADC0
 	setb BURST0 ; Autoscan continuos conversion mode
 	orl	ADMODB,#0x20 ;ADC0 clock is 7.3728MHz/2
-	mov	ADINS,#0x07 ; Select four channels of ADC0 for conversion
+	mov	ADINS,#0x0B ; Select four channels of ADC0 for conversion
 	mov	ADCON0,#0x05 ; Enable the converter and start immediately
 	; Wait for first conversion to complete
 InitADC0_L1:
@@ -62,6 +62,16 @@ HexAscii: db '0123456789ABCDEF'
 SendTemp:
 	mov dptr, #HexAscii 
 	
+	mov a, bcd+2
+	swap a
+	anl a, #0xf
+	movc a, @a+dptr
+	lcall putchar
+	mov a, bcd+2
+	anl a, #0xf
+	movc a, @a+dptr
+	lcall putchar
+
 	mov a, bcd+1
 	swap a
 	anl a, #0xf
@@ -192,6 +202,7 @@ ADC_to_PB_L0:
 Title: db 'ADC0 push buttons', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
 Thermocouple: db 'Thermocouple difference: ', 0
+Total: db 'Total Temp: ',0 
 Temp: db 'Temp from LM335: ', 0
 blank: db '                 ', 0
 Read_Temperature:
@@ -220,7 +231,10 @@ accumulate_loop:
 	lcall div32
 	Load_y(27300)
 	lcall sub32
-	
+		mov lmtemp+0, x+0
+	mov lmtemp+1, x+1
+	mov lmtemp+2, x+2
+	mov lmtemp+3, x+3
 	lcall hex2bcd
 	
 	lcall SendTemp 
@@ -275,18 +289,40 @@ accumulate_loop_Thermocouple:
 	Load_y(16)
 	lcall div32
 	; x has now the 12-bit representation of the temperature
-	
+
 	; Convert to temperature (C)
 	Load_y(33000) ; Vref is 3.3V
 	lcall mul32
 	Load_y(((1<<12)-1)) ; 2^12-1
 	lcall div32	
+
+	mov thermotemp+0, x+0
+	mov thermotemp+1, x+1
+	mov thermotemp+2, x+2
+	mov thermotemp+3, x+3	
 	lcall hex2bcd
 	
 	lcall SendTemp 
   ret
 
 
+get_total_temp:
+	mov x+0, thermotemp+0	
+	mov x+1, thermotemp+1	
+	mov x+2, thermotemp+2	
+	mov x+3, thermotemp+3
+	mov y+0, lmtemp+0	
+	mov y+1, lmtemp+1	
+	mov y+2, lmtemp+2	
+	mov y+3, lmtemp+3	
+	lcall add32
 
+	mov totaltemp+0, x+0
+	mov totaltemp+1, x+1
+	mov totaltemp+2, x+2
+	mov totaltemp+3, x+3
 
+	lcall hex2bcd
+	lcall SendTemp
+	ret
 end
