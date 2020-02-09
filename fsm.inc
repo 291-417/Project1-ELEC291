@@ -104,4 +104,58 @@ state5_done:
 abort_error:
     mov state, #0
     ret
+
+state0message: db 'Waiting...', 0
+state1message: db 'Ramp Soak ', 0
+state2message: db 'Preheat', 0
+state3message: db 'Peak Ramp', 0
+state4message: db 'Reflow', 0
+state5message: db 'Cooling', 0
+clear:  db '               ', 0
+update_lcd:
+    Set_Cursor(1,1)
+    Send_Constant_String(#clear)
+    mov a, state
+    clr c
+    subb a, #0
+    jnz check_state1
+    Set_Cursor(1,1)
+    Send_Constant_String(#state0message)
+    ret
+ check_state1:  
+    mov a, state
+    clr c
+    subb a, #1
+    jnz check_state2
+    Set_Cursor(1,1)
+    Send_Constant_String(#state1message)  
+    ret    
+check_state2:
+    mov a, state
+    clr c
+    subb a, #2
+    jnz check_state3
+    Set_Cursor(1,1)
+    Send_Constant_String(#state2message)  
+    ret    
+check_state3:
+    mov a, state
+    clr c
+    subb a, #3
+    jnz check_state4
+    Set_Cursor(1,1)
+    Send_Constant_String(#state3message)
+    ret 
+check_state4:
+    mov a, state
+    clr c
+    subb a, #4
+    jnz check_state5
+    Set_Cursor(1,1)
+    Send_Constant_String(#state4message)   
+    ret
+check_state5:
+    Set_Cursor(1,1)
+    Send_Constant_String(#state5message)  
+    ret
 end
