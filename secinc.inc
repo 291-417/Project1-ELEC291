@@ -14,6 +14,7 @@ Timer1_Init:
   mov TL1, #low(TIMER1_RELOAD)
   mov Count1ms+0, #0
   mov Count1ms+1, #0
+  clr second_flag
 	; Enable the timer and interrupts
     setb ET1  ; Enable timer 0 interrupt
     setb TR1  ; Start timer 0
