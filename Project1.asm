@@ -25,6 +25,7 @@ DIP_BUTTON1 equ P3.0
 PLAY_BUTTON equ P0.3
 SOUND equ P2.7
 PWM_PIN equ P0.2
+STARTSTOP equ P2.1
 
 FLASH_CE    EQU P2.4
 
@@ -37,6 +38,9 @@ dseg at 30H
   t0_reload_big: ds 1
   t0_reload_small: ds 1
   pwm_percentage: ds 1
+  state: ds 1
+  overall_time: ds 2
+  state_time: ds 2
  
 bseg
 
