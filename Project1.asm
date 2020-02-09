@@ -24,6 +24,7 @@ LCD_D7 equ P1.6
 DIP_BUTTON1 equ P3.0
 PLAY_BUTTON equ P0.3
 SOUND equ P2.7
+PWM_PIN equ P0.2
 
 FLASH_CE    EQU P2.4
 
@@ -33,6 +34,9 @@ dseg at 30H
   y:   ds 4
   bcd: ds 5
   sound_start: ds 3
+  t0_reload_big: ds 1
+  t0_reload_small: ds 1
+  pwm_percentage: ds 1
  
 bseg
 
@@ -54,7 +58,7 @@ org 0x0003 ; External interrupt 0 vector (not used in this code)
 	reti
 
 org 0x000B ; Timer/Counter 0 overflow interrupt vector (not used in this code)
-	reti
+	ljmp Timer0_ISR
 
 org 0x0013 ; External interrupt 1 vector (not used in this code)
 	reti
@@ -75,6 +79,7 @@ $INCLUDE(math32.inc)
 $include(LCD_4bit_LPC9351.inc) ; A library of LCD related functions and utility macros
 $include(sound.inc)
 $include(temppb.inc)
+$include(pwm.inc)
 $LIST
 
 ;---------------------------------;
@@ -134,6 +139,8 @@ MainProgram:
 	
   lcall CCU_Init
   lcall Init_SPI
+
+  lcall Timer0_Init
   
   lcall InitSerialPort
   lcall InitADC0
@@ -187,6 +194,8 @@ Play_Sounds:
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
+  mov pwm_percentage, #8
+  lcall Update_PWM_Percentages
 
   mov a, #28
   lcall Play_Numbered
@@ -194,6 +203,8 @@ Play_Sounds:
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
+  ;mov pwm_percentage, #2
+  ;lcall Update_PWM_Percentages
   
   mov a, #11
   lcall Play_Numbered
@@ -201,5 +212,7 @@ Play_Sounds:
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
   Wait_Milli_Seconds(#255)
+  mov pwm_percentage, #5
+  lcall Update_PWM_Percentages
   ret
 end
