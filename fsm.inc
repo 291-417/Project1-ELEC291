@@ -117,41 +117,27 @@ update_lcd:
     Set_Cursor(1,1)
     Send_Constant_String(#clear)
     mov a, state
-    clr c
-    subb a, #0
-    jnz check_state1
+    cjne a, #0, check_state1
     Set_Cursor(1,1)
     Send_Constant_String(#state0message)
     ret
  check_state1:  
-    mov a, state
-    clr c
-    subb a, #1
-    jnz check_state2
+    cjne a, #1, check_state2
     Set_Cursor(1,1)
     Send_Constant_String(#state1message)  
     ret    
 check_state2:
-    mov a, state
-    clr c
-    subb a, #2
-    jnz check_state3
+    cjne a, #2, check_state3
     Set_Cursor(1,1)
     Send_Constant_String(#state2message)  
     ret    
 check_state3:
-    mov a, state
-    clr c
-    subb a, #3
-    jnz check_state4
+    cjne a, #3, check_state4
     Set_Cursor(1,1)
     Send_Constant_String(#state3message)
     ret 
 check_state4:
-    mov a, state
-    clr c
-    subb a, #4
-    jnz check_state5
+    cjne a, #4, check_state5
     Set_Cursor(1,1)
     Send_Constant_String(#state4message)   
     ret
