@@ -1,0 +1,35 @@
+TIMER1_RATE   EQU 1000 ; should fire every millisecond
+TIMER1_RELOAD EQU ((65536-(CLK/(2*TIMER0_RATE))))
+
+;---------------------------------;
+; Routine to initialize the ISR   ;
+; for timer 1                   ;
+;---------------------------------;
+Timer1_Init:
+	mov a, TMOD
+	anl a, #0x0f ; Clear the bits for timer 1
+	orl a, #0x10 ; Configure timer 1 as 16-timer
+	mov TMOD, a
+	mov TH1, #high(TIMER1_RELOAD)
+  mov TL1, #low(TIMER1_RELOAD)
+	; Enable the timer and interrupts
+    setb ET0  ; Enable timer 0 interrupt
+    setb TR0  ; Start timer 0
+	ret
+
+;---------------------------------;
+; ISR for timer 1                 ;
+;---------------------------------;
+Timer1_ISR:
+  push acc
+  push ac
+  mov TL1, #low(TIMER1_RELOAD)
+  mov TH1, #high(TIMER1_RELOAD)
+  
+  ; Increment the 16-bit one mili second counter
+	inc Count1ms+0    ; Increment the low 8-bits first
+	mov a, Count1ms+0 ; If the low 8-bits overflow, then increment high 8-bits
+	jnz Inc_Done
+	inc Count1ms+1
+
+end
