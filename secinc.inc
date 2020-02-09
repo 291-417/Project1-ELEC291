@@ -12,9 +12,11 @@ Timer1_Init:
 	mov TMOD, a
 	mov TH1, #high(TIMER1_RELOAD)
   mov TL1, #low(TIMER1_RELOAD)
+  mov Count1ms+0, #0
+  mov Count1ms+1, #0
 	; Enable the timer and interrupts
-    setb ET0  ; Enable timer 0 interrupt
-    setb TR0  ; Start timer 0
+    setb ET1  ; Enable timer 0 interrupt
+    setb TR1  ; Start timer 0
 	ret
 
 ;---------------------------------;
@@ -31,5 +33,17 @@ Timer1_ISR:
 	mov a, Count1ms+0 ; If the low 8-bits overflow, then increment high 8-bits
 	jnz Inc_Done
 	inc Count1ms+1
-
+Inc_Done:
+  mov a, Count1ms+0
+  cjne a, #low(1000), Timer1_ISR_done
+  mov a, Count1ms+1
+  cjne a, #high(1000), Timer1_ISR_done
+  ; 1000 milliseconds have passed.  Set a flag so the main program knows
+	setb second_flag ; Let the main program know half second had passed
+  mov Count1ms+0, #0
+  mov Count1ms+1, #0
+Timer1_ISR_done:
+  pop ac
+  pop acc
+  reti
 end

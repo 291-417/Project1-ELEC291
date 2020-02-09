@@ -43,6 +43,7 @@ dseg at 30H
   thermotemp: ds 4
   totaltemp: ds 4
   pwm_counter: ds 1
+  Count1ms: ds 2
 bseg
 
 mf: dbit 1
@@ -53,6 +54,8 @@ PB3: dbit 1 ; Variable to store the state of pushbutton 3 after calling ADC_to_P
 PB4: dbit 1 ; Variable to store the state of pushbutton 4 after calling ADC_to_PB below
 PB5: dbit 1 ; Variable to store the state of pushbutton 5 after calling ADC_to_PB below
 PB6: dbit 1 ; Variable to store the state of pushbutton 6 after calling ADC_to_PB below
+
+second_flag: dbit 1 ; a second has passed, must update state_time and overall_time
 
 cseg
 
@@ -68,8 +71,8 @@ org 0x000B ; Timer/Counter 0 overflow interrupt vector (not used in this code)
 org 0x0013 ; External interrupt 1 vector (not used in this code)
 	reti
 
-org 0x001B ; Timer/Counter 1 overflow interrupt vector (not used in this code
-	reti
+org 0x001B ; Timer/Counter 1 overflow interrupt vector
+	ljmp Timer1_ISR
 
 org 0x0023 ; Serial port receive/transmit interrupt vector (not used in this code)
 	reti
@@ -86,6 +89,7 @@ $include(sound.inc)
 $include(temppb.inc)
 $include(pwm.inc)
 $include(fsm.inc)
+$include(secinc.inc)
 $LIST
 
 ;---------------------------------;
@@ -138,6 +142,7 @@ Sound_Start_Init:
 MainProgram:
   mov SP, #0x7F
   
+  mov state, #0
   lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
   lcall Double_Clk
@@ -147,6 +152,7 @@ MainProgram:
   lcall Init_SPI
 
   lcall Timer0_Init
+  lcall Timer1_Init
   
   lcall InitSerialPort
   lcall InitADC0
