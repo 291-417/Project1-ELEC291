@@ -151,8 +151,8 @@ MainProgram:
   lcall CCU_Init
   lcall Init_SPI
 
-  lcall Timer0_Init
-  lcall Timer1_Init
+  ;lcall Timer0_Init
+  ;lcall Timer1_Init
   
   lcall InitSerialPort
   lcall InitADC0
