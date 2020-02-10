@@ -189,6 +189,10 @@ MainProgram:
 	setb EA ; Enable global interrupts.
 
 forever:
+  jb DIP_BUTTON1, next
+	lcall settings
+  sjmp forever
+next:
   mov dptr, #Temp
 	;lcall SendString
   
@@ -197,16 +201,12 @@ forever:
   
   
   
-  ;lcall ADC_to_PB
+  lcall ADC_to_PB
   lcall fsm_update
   lcall update_lcd
 	;lcall Wait1S
-	jb DIP_BUTTON1, next
-	Wait_Milli_Seconds(#50)	
-	jb DIP_BUTTON1, next
-	lcall settings
-next:
-  jb second_flag, Every_Second_Stuff
+	
+  ;jb second_flag, Every_Second_Stuff
   ;jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever

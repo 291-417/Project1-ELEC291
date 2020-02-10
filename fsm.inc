@@ -128,7 +128,7 @@ state2message: db 'Preheat', 0
 state3message: db 'Peak Ramp', 0
 state4message: db 'Reflow', 0
 state5message: db 'Cooling', 0
-clear:  db '               ', 0
+clear:  db '                                   ', 0
 
 update_lcd:
     Set_Cursor(1,1)

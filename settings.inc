@@ -10,34 +10,34 @@ settings:
 mov a, param_state
 
 check_button0:
-    jnb PB0, check_button1
+    jb PB0, check_button1
     Wait_Milli_Seconds(#50)
-    jnb PB0, check_button1
-    jb PB0, $
+    jb PB0, check_button1
+    jnb PB0, $
     mov param_state, #0           ;if PB0 is pressed, change to state 0
     ljmp pstate0
 
 check_button1:
-    jnb PB1, check_button2
+    jb PB1, check_button2
     Wait_Milli_Seconds(#50)
-    jnb PB1, check_button2
-    jb PB1, $
+    jb PB1, check_button2
+    jnb PB1, $
     mov param_state, #1           ;if PB1 is pressed, change to state 1
     ljmp pstate0
     
 check_button2:
-    jnb PB2, check_button3
+    jb PB2, check_button3
     Wait_Milli_Seconds(#50)
-    jnb PB2, check_button3
-    jb PB2, $
+    jb PB2, check_button3
+    jnb PB2, $
     mov param_state, #2           ;if PB2 is pressed, change to state 2
     ljmp pstate0
 
 check_button3:
-    jnb PB3, pstate0
+    jb PB3, pstate0
     Wait_Milli_Seconds(#50)
-    jnb PB3, pstate0
-    jb PB3, $
+    jb PB3, pstate0
+    jnb PB3, $
     mov param_state, #3      ;if PB3 is pressed, change to state 3
     ljmp pstate0
 
@@ -46,6 +46,7 @@ check_button3:
 
 
 pstate0:
+    mov a, param_state
     cjne a, #0, pstate1 ; check if in state 0
     lcall update_lcd_param
     mov a, soak_temp
@@ -56,7 +57,7 @@ pstate0_done:
     ret
 
 pstate1:
-    cjne a, #0, pstate2 ; check if in state 0
+    cjne a, #1, pstate2 ; check if in state 0
     lcall update_lcd_param
     mov a, soak_time
     lcall check_increment
@@ -66,7 +67,7 @@ pstate1_done:
     ret
 
 pstate2:
-    cjne a, #0, pstate3 ; check if in state 0
+    cjne a, #2, pstate3 ; check if in state 0
     lcall update_lcd_param
     mov a, reflow_temp
     lcall check_increment
@@ -76,6 +77,7 @@ pstate2_done:
     ret
 
 pstate3:
+    
     lcall update_lcd_param
     mov a, reflow_time
     lcall check_increment
@@ -86,10 +88,10 @@ pstate3_done:
 
 
 check_increment:
-    jnb PB4, check_button5
+    jb PB4, check_button5
     Wait_Milli_Seconds(#50)
-    jnb PB4, check_button5
-    jb PB4, $
+    jb PB4, check_button5
+    jnb PB4, $
     cjne a, #255, check_button4_done
     mov a, #0
     ret
@@ -100,16 +102,16 @@ check_button4_done:
     ret
 
 check_button5:
-    jnb PB5, check_button5_return
+    jb PB5, check_button5_return
     Wait_Milli_Seconds(#50)
-    jnb PB5, check_button5_return
-    jb PB5, $
+    jb PB5, check_button5_return
+    jnb PB5, $
     cjne a, #0, check_button5_done
     mov a, #255
     ret
 
 check_button5_done:
-    sub a, #0x01     ;if PB5 is pressed, increment a
+    subb a, #0x01     ;if PB5 is pressed, increment a
     da a
     ret
 
@@ -121,18 +123,18 @@ param0message: db 'Soak Temp ', 0
 param1message: db 'Soak Time ', 0
 param2message: db 'Reflow Temp ', 0
 param3message: db 'Reflow Time ', 0
-clear:  db '               ', 0
+;clear:  db '               ', 0
 
 update_lcd_param:
-    Set_Cursor(1,1)
-    Send_Constant_String(#clear)
+    ;Set_Cursor(1,1)
+    ;Send_Constant_String(#clear)
     mov a, param_state
     cjne a, #0, check_state1_param
     Set_Cursor(1,1)
     Send_Constant_String(#param0message)
     Set_Cursor(1,14)
     Display_char(#11011111b)
-    lcall ?WriteCommand
+    ;lcall ?WriteCommand
     Set_Cursor(1,15)
     WriteData(#'C')
     Set_Cursor(2,1)
@@ -143,7 +145,7 @@ update_lcd_param:
     Set_Cursor(1,1)
     Send_Constant_String(#param1message)
     Set_Cursor(1,15)
-    lcall ?WriteCommand
+    ;lcall ?WriteCommand
     WriteData(#'s')
     Set_Cursor(2,1)
     Display_BCD(soak_time)  
@@ -155,7 +157,7 @@ check_state2_param:
     Set_Cursor(1,14)
     Display_char(#11011111b)
     Set_Cursor(1,15)
-    lcall ?WriteCommand
+    ;lcall ?WriteCommand
     WriteData(#'C')
     Set_Cursor(2,1)
     Display_BCD(reflow_temp)  
@@ -164,7 +166,7 @@ check_state3_param:
     Set_Cursor(1,1)
     Send_Constant_String(#param3message)
     Set_Cursor(1,15)
-    lcall ?WriteCommand
+    ;lcall ?WriteCommand
     WriteData(#'s')
     Set_Cursor(2,1)
     Display_BCD(reflow_time)  
