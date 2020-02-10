@@ -129,14 +129,10 @@ state3message: db 'Peak Ramp', 0
 state4message: db 'Reflow', 0
 state5message: db 'Cooling', 0
 clear:  db '               ', 0
-runtimemessage: db 'Running Time', 0
-update_lcd:
 
+update_lcd:
     Set_Cursor(1,1)
     Send_Constant_String(#clear)
-    Set_Cursor(2,1)
-    Send_Constant_String(#runtimemessage)
-    
     mov a, state
     cjne a, #0, check_state1
     Set_Cursor(1,1)

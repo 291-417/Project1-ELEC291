@@ -166,6 +166,8 @@ MainProgram:
 	mov overall_time+0, #0
 	mov overall_time+1, #0
   mov temp_truncated, #0
+  mov temp_bcd+0, #1
+  mov temp_bcd+1, #0
   ; Set beginning message on LCD
   Set_Cursor(1, 1)
   Send_Constant_String(#Title)
@@ -219,8 +221,8 @@ Every_Second_Stuff:
   ;mov bcd+1, #0x02
   ;mov bcd+0, #0x53
   clr second_flag
-  lcall BCD_To_Sound
-  lcall Say_Stuff_FSM
+  ;lcall BCD_To_Sound
+  ;lcall Say_Stuff_FSM
   inc state_time
   inc overall_time+0
   mov a, overall_time+0
