@@ -231,7 +231,7 @@ accumulate_loop:
 	lcall div32
 	Load_y(27300)
 	lcall sub32
-		mov lmtemp+0, x+0
+	mov lmtemp+0, x+0
 	mov lmtemp+1, x+1
 	mov lmtemp+2, x+2
 	mov lmtemp+3, x+3
