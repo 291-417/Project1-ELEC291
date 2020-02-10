@@ -204,7 +204,7 @@ forever:
   ;lcall Read_Temperature
   ;lcall Play_Sounds
   mov bcd+1, #0x02
-  mov bcd+0, #0x53
+  mov bcd+0, #0x01
   setb say_a_number
   ljmp forever
 
@@ -214,6 +214,8 @@ forever:
     ;Send_Constant_String(#blank)
     ;ljmp next_check
 Every_Second_Stuff:
+  ;mov bcd+1, #0x02
+  ;mov bcd+0, #0x53
   clr second_flag
   lcall BCD_To_Sound
   inc state_time
