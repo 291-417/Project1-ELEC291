@@ -287,12 +287,12 @@ MainProgram:
 	
     lcall LCD_4BIT
     ; For convenience a few handy macros are included in 'LCD_4bit_LPC9351.inc':
-	Set_Cursor(1, 1)
-    Send_Constant_String(#Title)
+	;Set_Cursor(1, 1)
+    ;Send_Constant_String(#Title)
 
 	lcall Wait1S ; Wait a bit so PUTTy has a chance to start
-	mov dptr, #InitialMessage
-	lcall SendString
+	;mov dptr, #InitialMessage
+	;lcall SendString
 
 forever_loop:
     ; Send the conversion results via the serial port to putty.
