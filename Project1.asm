@@ -154,6 +154,11 @@ MainProgram:
   
   mov state, #0
   mov param_state, #0
+  mov soak_temp, #0
+  mov soak_time, #0
+  mov reflow_temp, #0
+  mov reflow_time, #0
+  
   lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
   lcall Double_Clk

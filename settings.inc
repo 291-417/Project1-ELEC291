@@ -123,6 +123,8 @@ param0message: db 'Soak Temp ', 0
 param1message: db 'Soak Time ', 0
 param2message: db 'Reflow Temp ', 0
 param3message: db 'Reflow Time ', 0
+param4message: db 'C ', 0
+param5message: db 's ', 0
 ;clear:  db '               ', 0
 
 update_lcd_param:
@@ -136,7 +138,7 @@ update_lcd_param:
     Display_char(#11011111b)
     ;lcall ?WriteCommand
     Set_Cursor(1,15)
-    WriteData(#'C')
+    Send_Constant_String(#param4message)
     Set_Cursor(2,1)
     Display_BCD(soak_temp)
     ret
@@ -146,7 +148,7 @@ update_lcd_param:
     Send_Constant_String(#param1message)
     Set_Cursor(1,15)
     ;lcall ?WriteCommand
-    WriteData(#'s')
+    Send_Constant_String(#param5message)
     Set_Cursor(2,1)
     Display_BCD(soak_time)  
     ret    
@@ -158,7 +160,7 @@ check_state2_param:
     Display_char(#11011111b)
     Set_Cursor(1,15)
     ;lcall ?WriteCommand
-    WriteData(#'C')
+    Send_Constant_String(#param4message)
     Set_Cursor(2,1)
     Display_BCD(reflow_temp)  
     ret    
@@ -167,7 +169,7 @@ check_state3_param:
     Send_Constant_String(#param3message)
     Set_Cursor(1,15)
     ;lcall ?WriteCommand
-    WriteData(#'s')
+    Send_Constant_String(#param5message)
     Set_Cursor(2,1)
     Display_BCD(reflow_time)  
     ret 
