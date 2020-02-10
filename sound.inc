@@ -36,13 +36,14 @@ Number_Of_Hundreds:
 	mov a, r0
 	cjne a, talker_counter, Say_Hundred
 	mov a, r1
-	mov next_character, a ; say number of hundreds next iteration
+	lcall Play_Numbered ; say number of hundreds next iteration
 	ljmp End_Talking
 Say_Hundred:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Tens_Sound
-	mov next_character, #29 ; say hundred at next iteration
+	mov a, #29 ; say hundred at next iteration
+	lcall Play_Numbered
 	ljmp End_Talking
 Tens_Sound:
 	inc r0
@@ -56,7 +57,7 @@ Tens_Sound:
 	anl a, #0xf0 ; say upper character only
 	swap a ; now the upper character is in the lower character
 	add a, #19 ; Now we should have character number to say in accumulator
-	mov next_character, a ; put it in the next character 
+	lcall Play_Numbered ; put it in the next character 
 	sjmp End_Talking
 Single_Tens_Sound:
 	mov a, r0
@@ -71,7 +72,7 @@ Single_Tens_Sound:
 	mov b, #10
 	mul ab ; tens digit is now in proper binary instead of bcd
 	add a, r1 ; Now number is in binary properly instead of bcd
-	mov next_character, a
+	lcall Play_Numbered
 	sjmp End_Talking
 Ones_Sound:
 	inc r0
@@ -79,7 +80,7 @@ Ones_Sound:
 	cjne a, talker_counter, Say_No_More
 	mov a, bcd+0
 	anl a, #0x0f ; get only ones digit
-	mov next_character, a ; say ones digit
+	lcall Play_Numbered ; say ones digit
 	sjmp End_Talking
 Say_No_More:
 	clr say_a_number

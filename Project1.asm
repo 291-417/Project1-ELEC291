@@ -153,7 +153,7 @@ MainProgram:
   lcall CCU_Init
   lcall Init_SPI
 
-  ;lcall Timer0_Init
+  lcall Timer0_Init
   lcall Timer1_Init
   
   lcall InitSerialPort
@@ -214,6 +214,7 @@ forever:
     ;Send_Constant_String(#blank)
     ;ljmp next_check
 Every_Second_Stuff:
+  clr second_flag
   lcall BCD_To_Sound
   inc state_time
   inc overall_time+0
