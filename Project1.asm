@@ -185,10 +185,10 @@ forever:
   
   mov dptr, #Total
   lcall SendString
-  lcall get_total_temp
+  ;lcall get_total_temp
   ;lcall ADC_to_PB
-  lcall fsm_update
-  lcall update_lcd
+  ;lcall fsm_update
+  ;lcall update_lcd
 	;lcall Wait1S
 	;jb DIP_BUTTON1, next
 	;Wait_Milli_Seconds(#50)	
@@ -203,8 +203,8 @@ forever:
   ;lcall Get_Thermocouple
   ;lcall Read_Temperature
   ;lcall Play_Sounds
-  mov bcd+1, #0x02
-  mov bcd+0, #0x01
+  mov bcd+1, #0x00
+  mov bcd+0, #0x99
   setb say_a_number
   ljmp forever
 

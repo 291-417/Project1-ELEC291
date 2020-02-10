@@ -47,8 +47,6 @@ state1_done:
     ret
 check_time_state1:
     mov a, state_time
-    mov b, a
-    lcall sendhex
     mov a, state_time
     clr c
     subb a, #60 ; if greater than 60 carry is not set
