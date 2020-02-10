@@ -20,6 +20,20 @@ READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 cseg
 $include(obamaindex.inc)
 
+Say_Stuff_FSM:
+	mov a, state
+	jnz Say_Stuff_FSM_Begin_Saying_Things
+	ret
+Say_Stuff_FSM_Begin_Saying_Things:
+	mov a, state_time
+	mov b, #10
+	div ab
+	mov a, b
+	jnz End_Say_Stuff_FSM
+	setb say_a_number
+End_Say_Stuff_FSM:
+	ret
+
 BCD_To_Sound:
 	jb say_a_number, Start_Saying_Things_From_BCD
 	ret
@@ -29,7 +43,7 @@ Start_Saying_Things_From_BCD:
 	push ar0
 	push ar1
 	mov r0, #0
-	mov a, bcd+1
+	mov a, temp_bcd+1
 	jz Tens_Sound_No_Hundred ; if we're under 100 then go to printing the lower digits
 Number_Of_Hundreds:
 	mov r1, a
@@ -51,14 +65,14 @@ Tens_Sound_No_Hundred:
 	dec r0
 Tens_Sound:
 	clr c
-	mov a, bcd+0
+	mov a, temp_bcd+0
 	subb a, #0x20
 	jc Single_Tens_Sound ; If less than 20, that is, if carry flag is set, only need to say one sound
 	inc r0
 	clr c
 	mov a, r0
 	cjne a, talker_counter, Ones_Sound
-	mov a, bcd+0
+	mov a, temp_bcd+0
 	anl a, #0xf0 ; say upper character only
 	swap a ; now the upper character is in the lower character
 	add a, #18 ; Now we should have character number to say in accumulator
@@ -70,11 +84,11 @@ Single_Tens_Sound:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Say_No_More
-	mov a, bcd+0
+	mov a, temp_bcd+0
 	jz Say_No_More ; if zero then you don't need to say anything
 	anl a, #0x0f ; get only ones digit
 	mov r1, a ; save ones digit in r1
-	mov a, bcd+0
+	mov a, temp_bcd+0
 	anl a, #0xf0 ; get only tens digit
 	swap a ; put tens digit in ones digit
 	mov b, #10
@@ -87,7 +101,7 @@ Ones_Sound:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Say_No_More
-	mov a, bcd+0
+	mov a, temp_bcd+0
 	anl a, #0x0f ; get only ones digit
 	lcall Play_Numbered
   inc talker_counter ; say ones digit
