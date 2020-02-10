@@ -206,6 +206,7 @@ Total: db 'Total Temp: ',0
 Temp: db 'Temp from LM335: ', 0
 blank: db '                 ', 0
 Read_Temperature:
+	clr EA
   	Load_X(0)
     mov x+0, AD0DAT1
 	mov R7, #255
@@ -238,6 +239,7 @@ accumulate_loop:
 	lcall hex2bcd
 	
 	lcall SendTemp 
+	setb EA
   ret
 
 Display_PushButtons_ADC:
@@ -273,6 +275,7 @@ Display_PushButtons_ADC:
 	ret
 
 Get_Thermocouple:
+	clr EA
   	Load_X(0)
     mov x+0, AD0DAT3
 	mov R7, #255
@@ -303,6 +306,7 @@ accumulate_loop_Thermocouple:
 	lcall hex2bcd
 	
 	lcall SendTemp 
+	setb EA
   ret
 
 

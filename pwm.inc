@@ -31,6 +31,7 @@ Timer0_Init:
 ; 2048 Hz square wave at pin P3.7 ;
 ;---------------------------------;
 Timer0_ISR:
+  reti
   push acc
   push ac
   mov TL0, #low(TIMER0_RELOAD)

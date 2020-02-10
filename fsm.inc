@@ -18,9 +18,9 @@ mov a, state
 state0:
     cjne a, #0, state1 ; check if in state 0
     Set_PWM_Percentage(#0) ; power set to zero
-    jb STARTSTOP, state0_done
+    jnb STARTSTOP, state0_done
     Wait_Milli_Seconds(#50)
-    jb STARTSTOP, state0_done
+    jnb STARTSTOP, state0_done
     mov a, #0
     mov overall_time+0, #0x0
     mov overall_time+1, #0x0
