@@ -47,6 +47,11 @@ dseg at 30H
   talker_counter: ds 1
   temp_truncated: ds 1
   temp_bcd: ds 2
+  param_state: ds 1
+  soak_temp: ds 1
+  soak_time: ds 1
+  reflow_temp: ds 1
+  reflow_time: ds 1
 bseg
 
 mf: dbit 1
@@ -147,6 +152,7 @@ MainProgram:
   mov SP, #0x7F
   
   mov state, #0
+  mov param_state, #0
   lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
   lcall Double_Clk
@@ -222,7 +228,7 @@ Every_Second_Stuff:
   ;mov bcd+0, #0x53
   clr second_flag
   ;lcall BCD_To_Sound
-  ;lcall Say_Stuff_FSM
+  ;lcall Say_Stuff_FSM  
   inc state_time
   inc overall_time+0
   mov a, overall_time+0
