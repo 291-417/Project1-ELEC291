@@ -57,10 +57,32 @@ pstate0_done:
 
 pstate1:
     cjne a, #0, pstate2 ; check if in state 0
+    lcall update_lcd_param
+    mov a, soak_time
+    lcall check_increment
+    mov soak_time, a
 
+pstate1_done:
+    ret
 
 pstate2:
+    cjne a, #0, pstate3 ; check if in state 0
+    lcall update_lcd_param
+    mov a, reflow_temp
+    lcall check_increment
+    mov reflow_temp, a
 
+pstate2_done:
+    ret
+
+pstate3:
+    lcall update_lcd_param
+    mov a, reflow_time
+    lcall check_increment
+    mov reflow_time, a
+
+pstate3_done:
+    ret
 
 
 check_increment:
