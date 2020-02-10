@@ -175,6 +175,8 @@ accumulate_loop:
 	
 	lcall SendTemp ; Send to PUTTy, with 2 decimal digits to show that it actually works
 	lcall lmtemp
+	
+	
 	lcall Wait1S
 
 	sjmp forever_loop

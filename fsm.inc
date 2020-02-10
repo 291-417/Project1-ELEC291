@@ -21,7 +21,7 @@ state0:
     jnb STARTSTOP, state0_done
     Wait_Milli_Seconds(#50)
     jnb STARTSTOP, state0_done
-    mov a, #0
+    jb STARTSTOP, $
     mov overall_time+0, #0x0
     mov overall_time+1, #0x0
     mov state_time, #0x0
@@ -32,12 +32,12 @@ state0_done:
 state1:
     cjne a, #1, state2
     Set_PWM_Percentage(#100) ; power set to 100%
-    mov a, totaltemp+0
+    lcall divsadtimes ; grabs temp into a
     clr c
     subb a, #50 ; if less than 50 carry is set
     jc check_time_state1
 continue_state1:
-    mov a, totaltemp+0
+    lcall divsadtimes
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
@@ -47,9 +47,12 @@ state1_done:
     ret
 check_time_state1:
     mov a, state_time
+    mov b, a
+    lcall sendhex
+    mov a, state_time
     clr c
-    subb a, #60 ; if less than 60 carry is set
-    jc continue_state1
+    subb a, #60 ; if greater than 60 carry is not set
+    jc continue_state1 
     mov state, #0
     sjmp state1_done
 
@@ -68,7 +71,7 @@ state2_done:
 state3:
     cjne a, #3, state4
     Set_PWM_Percentage(#100)
-    mov a, totaltemp+0
+    lcall divsadtimes
     clr c
     subb a, #220 ; if less than 220 carry is set
     jc state3_done
@@ -92,7 +95,7 @@ state4_done:
 state5:
     cjne a, #5, abort_error
     Set_PWM_Percentage(#0)
-    mov a, totaltemp+0
+    lcall divsadtimes
     clr c
     subb a, #60 ; if less than 60 carry is set
     jc state5_done
@@ -104,6 +107,19 @@ state5_done:
 abort_error:
     mov state, #0
     ret
+
+divsadtimes:
+    mov x+0, totaltemp+0
+    mov x+1, totaltemp+1
+    mov x+2, totaltemp+2
+    mov x+3, totaltemp+3
+    load_Y(100)
+    lcall div32
+
+    mov a, x+0
+    ret
+
+
 
 state0message: db 'Waiting...', 0
 state1message: db 'Ramp Soak ', 0
