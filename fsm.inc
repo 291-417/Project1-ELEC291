@@ -32,12 +32,14 @@ state0_done:
 state1:
     cjne a, #1, state2
     Set_PWM_Percentage(#100) ; power set to 100%
-    lcall divsadtimes ; grabs temp into a
+    lcall divsadtimes ; grabs temp into temp_truncated
+    mov a, temp_truncated
     clr c
     subb a, #50 ; if less than 50 carry is set
     jc check_time_state1
 continue_state1:
     lcall divsadtimes
+    mov a, temp_truncated
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
@@ -46,7 +48,6 @@ continue_state1:
 state1_done:
     ret
 check_time_state1:
-    mov a, state_time
     mov a, state_time
     clr c
     subb a, #60 ; if greater than 60 carry is not set
@@ -70,6 +71,7 @@ state3:
     cjne a, #3, state4
     Set_PWM_Percentage(#100)
     lcall divsadtimes
+    mov a, temp_truncated
     clr c
     subb a, #220 ; if less than 220 carry is set
     jc state3_done
@@ -94,6 +96,7 @@ state5:
     cjne a, #5, abort_error
     Set_PWM_Percentage(#0)
     lcall divsadtimes
+    mov a, temp_truncated
     clr c
     subb a, #60 ; if less than 60 carry is set
     jc state5_done
@@ -114,7 +117,7 @@ divsadtimes:
     load_Y(100)
     lcall div32
 
-    mov a, x+0
+    mov temp_truncated, x+0
     ret
 
 

@@ -45,6 +45,8 @@ dseg at 30H
   pwm_counter: ds 1
   Count1ms: ds 2
   talker_counter: ds 1
+  temp_truncated: ds 1
+  temp_bcd: ds 2
 bseg
 
 mf: dbit 1
@@ -163,6 +165,7 @@ MainProgram:
 	mov state_time, #0
 	mov overall_time+0, #0
 	mov overall_time+1, #0
+  mov temp_truncated, #0
   ; Set beginning message on LCD
   Set_Cursor(1, 1)
   Send_Constant_String(#Title)
@@ -185,10 +188,10 @@ forever:
   
   mov dptr, #Total
   lcall SendString
-  ;lcall get_total_temp
+  lcall get_total_temp
   ;lcall ADC_to_PB
-  ;lcall fsm_update
-  ;lcall update_lcd
+  lcall fsm_update
+  lcall update_lcd
 	;lcall Wait1S
 	;jb DIP_BUTTON1, next
 	;Wait_Milli_Seconds(#50)	
@@ -196,12 +199,12 @@ forever:
 	;lcall Display_PushButtons_ADC
 ;next_check:
   jb second_flag, Every_Second_Stuff
-  jb PLAY_BUTTON, forever
-  Wait_Milli_Seconds(#50)
-  jb PLAY_BUTTON, forever
-  jnb PLAY_BUTTON, $
-  ;lcall Get_Thermocouple
-  ;lcall Read_Temperature
+  ;jb PLAY_BUTTON, forever
+  ;Wait_Milli_Seconds(#50)
+  ;jb PLAY_BUTTON, forever
+  ;jnb PLAY_BUTTON, $
+  lcall Get_Thermocouple
+  lcall Read_Temperature
   ;lcall Play_Sounds
   mov bcd+1, #0x00
   mov bcd+0, #0x99
