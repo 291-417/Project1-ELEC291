@@ -44,6 +44,7 @@ dseg at 30H
   totaltemp: ds 4
   pwm_counter: ds 1
   Count1ms: ds 2
+  talker_counter: ds 1
 bseg
 
 mf: dbit 1
@@ -56,6 +57,7 @@ PB5: dbit 1 ; Variable to store the state of pushbutton 5 after calling ADC_to_P
 PB6: dbit 1 ; Variable to store the state of pushbutton 6 after calling ADC_to_PB below
 
 second_flag: dbit 1 ; a second has passed, must update state_time and overall_time
+say_a_number: dbit 1 ; Say the number in BCD if this is high
 
 cseg
 
@@ -193,14 +195,17 @@ forever:
 	;jb DIP_BUTTON1, next
 	;lcall Display_PushButtons_ADC
 ;next_check:
-  ;jb PLAY_BUTTON, forever
-  ;Wait_Milli_Seconds(#50)
-  ;jb PLAY_BUTTON, forever
-  ;jnb PLAY_BUTTON, $
-  lcall Get_Thermocouple
-  lcall Read_Temperature
   jb second_flag, Every_Second_Stuff
+  jb PLAY_BUTTON, forever
+  Wait_Milli_Seconds(#50)
+  jb PLAY_BUTTON, forever
+  jnb PLAY_BUTTON, $
+  ;lcall Get_Thermocouple
+  ;lcall Read_Temperature
   ;lcall Play_Sounds
+  mov bcd+1, #0x02
+  mov bcd+0, #0x53
+  setb say_a_number
   ljmp forever
 
 
@@ -209,7 +214,7 @@ forever:
     ;Send_Constant_String(#blank)
     ;ljmp next_check
 Every_Second_Stuff:
-  
+  lcall BCD_To_Sound
   inc state_time
   inc overall_time+0
   mov a, overall_time+0
