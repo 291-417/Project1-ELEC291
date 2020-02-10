@@ -158,6 +158,9 @@ MainProgram:
   lcall InitADC0
   lcall LCD_4BIT
 
+	mov state_time, #0
+	mov overall_time+0, #0
+	mov overall_time+1, #0
   ; Set beginning message on LCD
   Set_Cursor(1, 1)
   Send_Constant_String(#Title)
