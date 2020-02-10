@@ -221,6 +221,7 @@ Every_Second_Stuff:
   ;mov bcd+0, #0x53
   clr second_flag
   lcall BCD_To_Sound
+  lcall Say_Stuff_FSM
   inc state_time
   inc overall_time+0
   mov a, overall_time+0
