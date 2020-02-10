@@ -21,12 +21,12 @@ cseg
 $include(obamaindex.inc)
 
 Say_Stuff_FSM:
-	;mov a, state
-	;jnz Say_Stuff_FSM_Begin_Saying_Things
-	;ret
+	mov a, state
+	jnz Say_Stuff_FSM_Begin_Saying_Things
+	ret
 Say_Stuff_FSM_Begin_Saying_Things:
 	mov a, state_time
-	mov b, #10
+	mov b, #15
 	div ab
 	mov a, b
 	jnz End_Say_Stuff_FSM

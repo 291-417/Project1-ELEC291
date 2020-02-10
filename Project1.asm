@@ -178,7 +178,7 @@ MainProgram:
 	mov overall_time+0, #0
 	mov overall_time+1, #0
   mov temp_truncated, #0
-  mov temp_bcd+0, #1
+  mov temp_bcd+0, #0x02
   mov temp_bcd+1, #0
   ; Set beginning message on LCD
   Set_Cursor(1, 1)
@@ -211,7 +211,7 @@ next:
   lcall update_lcd
 	;lcall Wait1S
 	
-  ;jb second_flag, Every_Second_Stuff
+  jb second_flag, Every_Second_Stuff
   ;jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever
@@ -235,6 +235,10 @@ Every_Second_Stuff:
   ;mov bcd+1, #0x02
   ;mov bcd+0, #0x53
   clr second_flag
+  Set_Cursor(1,1)
+  Send_Constant_String(#clear)
+  Set_Cursor(2,1)
+  Send_Constant_String(#clear)
   jnb say_a_number, Check_Temperatures
 Every_Second_2:
   lcall BCD_To_Sound

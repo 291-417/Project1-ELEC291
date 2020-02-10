@@ -43,6 +43,8 @@ continue_state1:
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
+    mov dptr, #title
+	lcall SendString
     mov state_time, #0
     mov state, #2
 state1_done:
@@ -131,8 +133,8 @@ state5message: db 'Cooling', 0
 clear:  db '                                   ', 0
 
 update_lcd:
-    Set_Cursor(1,1)
-    Send_Constant_String(#clear)
+    ;Set_Cursor(1,1)
+    ;Send_Constant_String(#clear)
     mov a, state
     cjne a, #0, check_state1
     Set_Cursor(1,1)

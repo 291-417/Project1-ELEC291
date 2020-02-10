@@ -326,6 +326,10 @@ get_total_temp:
 	mov totaltemp+2, x+2
 	mov totaltemp+3, x+3
 	lcall hex2bcd
+	mov a, bcd+1
+	mov temp_bcd+0, a
+	mov a, bcd+2
+	mov temp_bcd+1, a
 	;mov temp_bcd+0, bcd+1
 	;mov temp_bcd+1, bcd+2
 	lcall SendTemp
