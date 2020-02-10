@@ -203,12 +203,11 @@ forever:
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever
   ;jnb PLAY_BUTTON, $
+  jnb say_a_number, Check_Temperatures
+  ljmp forever
+Check_Temperatures:
   lcall Get_Thermocouple
   lcall Read_Temperature
-  ;lcall Play_Sounds
-  mov bcd+1, #0x00
-  mov bcd+0, #0x99
-  setb say_a_number
   ljmp forever
 
 
