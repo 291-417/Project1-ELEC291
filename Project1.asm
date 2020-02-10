@@ -99,6 +99,7 @@ $include(temppb.inc)
 $include(pwm.inc)
 $include(fsm.inc)
 $include(secinc.inc)
+$include(settings.inc)
 $LIST
 
 ;---------------------------------;
@@ -189,34 +190,36 @@ MainProgram:
 
 forever:
   mov dptr, #Temp
-	lcall SendString
+	;lcall SendString
   
   mov dptr, #Thermocouple
-	lcall SendString
+	;lcall SendString
   
-  mov dptr, #Total
-  lcall SendString
-  lcall get_total_temp
+  
+  
   ;lcall ADC_to_PB
   lcall fsm_update
   lcall update_lcd
 	;lcall Wait1S
-	;jb DIP_BUTTON1, next
-	;Wait_Milli_Seconds(#50)	
-	;jb DIP_BUTTON1, next
-	;lcall Display_PushButtons_ADC
-;next_check:
+	jb DIP_BUTTON1, next
+	Wait_Milli_Seconds(#50)	
+	jb DIP_BUTTON1, next
+	lcall settings
+next:
   jb second_flag, Every_Second_Stuff
   ;jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever
   ;jnb PLAY_BUTTON, $
-  jnb say_a_number, Check_Temperatures
+  
   ljmp forever
 Check_Temperatures:
+  mov dptr, #Total
+  lcall SendString
   lcall Get_Thermocouple
   lcall Read_Temperature
-  ljmp forever
+  lcall get_total_temp
+  ljmp Every_Second_2
 
 
 ;next:
@@ -227,8 +230,10 @@ Every_Second_Stuff:
   ;mov bcd+1, #0x02
   ;mov bcd+0, #0x53
   clr second_flag
-  ;lcall BCD_To_Sound
-  ;lcall Say_Stuff_FSM  
+  jnb say_a_number, Check_Temperatures
+Every_Second_2:
+  lcall BCD_To_Sound
+  lcall Say_Stuff_FSM
   inc state_time
   inc overall_time+0
   mov a, overall_time+0
