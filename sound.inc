@@ -52,7 +52,7 @@ Tens_Sound:
 	clr c
 	mov a, bcd+0
 	subb a, #0x20
-	;jc Single_Tens_Sound ; If less than 20, that is, if carry flag is set, only need to say one sound
+	jc Single_Tens_Sound ; If less than 20, that is, if carry flag is set, only need to say one sound
 	mov a, r0
 	cjne a, talker_counter, Ones_Sound
 	mov a, bcd+0
