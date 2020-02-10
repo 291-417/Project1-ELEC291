@@ -28,38 +28,46 @@ Start_Saying_Things_From_BCD:
 	push acc
 	push ar0
 	push ar1
-	mov a, bcd+1
-	jz Tens_Sound ; if we're under 100 then go to printing the lower digits
-Number_Of_Hundreds:
 	mov r0, #0
+	mov a, bcd+1
+	jz Tens_Sound_No_Hundred ; if we're under 100 then go to printing the lower digits
+Number_Of_Hundreds:
 	mov r1, a
 	mov a, r0
 	cjne a, talker_counter, Say_Hundred
 	mov a, r1
-	lcall Play_Numbered ; say number of hundreds next iteration
+	lcall Play_Numbered
+  inc talker_counter ; say number of hundreds next iteration
 	ljmp End_Talking
 Say_Hundred:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Tens_Sound
-	mov a, #29 ; say hundred at next iteration
+	mov a, #28 ; say hundred at next iteration
 	lcall Play_Numbered
-	ljmp End_Talking
+  inc talker_counter
+	sjmp End_Talking
+Tens_Sound_No_Hundred:
+	dec r0
 Tens_Sound:
-	inc r0
 	clr c
 	mov a, bcd+0
 	subb a, #0x20
 	jc Single_Tens_Sound ; If less than 20, that is, if carry flag is set, only need to say one sound
+	inc r0
+	clr c
 	mov a, r0
 	cjne a, talker_counter, Ones_Sound
 	mov a, bcd+0
 	anl a, #0xf0 ; say upper character only
 	swap a ; now the upper character is in the lower character
-	add a, #19 ; Now we should have character number to say in accumulator
-	lcall Play_Numbered ; put it in the next character 
+	add a, #18 ; Now we should have character number to say in accumulator
+	;mov a, #21
+	lcall Play_Numbered
+  inc talker_counter ; put it in the next character 
 	sjmp End_Talking
 Single_Tens_Sound:
+	inc r0
 	mov a, r0
 	cjne a, talker_counter, Say_No_More
 	mov a, bcd+0
@@ -73,6 +81,7 @@ Single_Tens_Sound:
 	mul ab ; tens digit is now in proper binary instead of bcd
 	add a, r1 ; Now number is in binary properly instead of bcd
 	lcall Play_Numbered
+  inc talker_counter
 	sjmp End_Talking
 Ones_Sound:
 	inc r0
@@ -80,7 +89,8 @@ Ones_Sound:
 	cjne a, talker_counter, Say_No_More
 	mov a, bcd+0
 	anl a, #0x0f ; get only ones digit
-	lcall Play_Numbered ; say ones digit
+	lcall Play_Numbered
+  inc talker_counter ; say ones digit
 	sjmp End_Talking
 Say_No_More:
 	clr say_a_number
