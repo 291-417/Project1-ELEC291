@@ -217,7 +217,8 @@ next:
   
   ;mov dptr, #Thermocouple
 	;lcall SendString
-  
+  ;mov b, state_time
+  ;lcall SendHex
   jb Abort, moveon
   jnb ABort, $  
   mov a, state
@@ -225,6 +226,13 @@ next:
   mov state, #0x0 
  
 moveon:
+  ;mov a, temp_truncated
+  ;clr c
+  ;subb a, #250
+  ;jc moveon2
+  ;mov state, #0
+  ;clr SOUND
+moveon2:
   lcall ADC_to_PB
   lcall fsm_update
   lcall update_lcd
@@ -270,56 +278,4 @@ increment_upper_seconds:
   inc overall_time+1
 End_Every_Second:
   ljmp forever
-
-Play_Sounds:
-  ;mov a, #2
-  ;lcall Play_Numbered
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  ;Set_PWM_Percentage(#80)
-
-  ;mov a, #28
-  ;lcall Play_Numbered
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Set_PWM_Percentage(#100)
-  
-  ;mov a, #11
-  ;lcall Play_Numbered
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  ;Set_PWM_Percentage(#0)
-
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  Wait_Milli_Seconds(#255)
-  ;Set_PWM_Percentage(#DEFAULT_PWM)
-  ret
 end

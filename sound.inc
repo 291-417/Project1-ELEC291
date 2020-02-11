@@ -18,15 +18,17 @@ ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
 READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
-$include(obamaindex.inc)
+$include(obamaindex_new.inc)
 
 Say_Stuff_FSM:
 	mov a, state
 	jnz Say_Stuff_FSM_Begin_Saying_Things
+	;mov a, #36
+	;lcall Play_Numbered
 	ret
 Say_Stuff_FSM_Begin_Saying_Things:
 	mov a, state_time
-	mov b, #15
+	mov b, #7
 	div ab
 	mov a, b
 	jnz End_Say_Stuff_FSM
@@ -119,8 +121,8 @@ Play_Numbered:
 ; Assumes that character number is in accumulator
 	push ar0
 	;anl a, #0x0f ; just make sure that it's only the lower bits
-	setb c
-	subb a, #0 ; We're starting from zero so we need to subtract one
+	;setb c
+	;subb a, #0 ; We're starting from zero so we need to subtract one
 	mov b, #3 ; Each row is three bytes
 	mul ab ; Multiplication to get number of bytes instead of number of rows
 	mov r0, a ; Store it so that we don't have to do it again
