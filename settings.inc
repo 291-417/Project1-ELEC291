@@ -42,7 +42,8 @@ pstate0:
     cjne a, #0, pstate1 ; check if in state 0
     lcall update_lcd_param
     mov a, soak_temp
-    ;lcall check_increment
+    mov b, soak_temp
+    lcall check_increment
     mov soak_temp, a
 
 pstate0_done:
@@ -52,7 +53,8 @@ pstate1:
     cjne a, #1, pstate2 ; check if in state 0
     lcall update_lcd_param
     mov a, soak_time
-    ;lcall check_increment
+    mov b, soak_time
+    lcall check_increment
     mov soak_time, a
 
 pstate1_done:
@@ -62,7 +64,8 @@ pstate2:
     cjne a, #2, pstate3 ; check if in state 0
     lcall update_lcd_param
     mov a, reflow_temp
-    ;lcall check_increment
+    mov b, reflow_temp
+    lcall check_increment
     mov reflow_temp, a
 
 pstate2_done:
@@ -71,7 +74,8 @@ pstate2_done:
 pstate3:
     lcall update_lcd_param
     mov a, reflow_time
-    ;lcall check_increment
+    mov b, reflow_time
+    lcall check_increment
     mov reflow_time, a
 
 pstate3_done:
@@ -81,31 +85,28 @@ pstate3_done:
 
 
 check_increment:
-    lcall ADC_to_PB
     jnb PB4, increment
     jnb PB5, decrement
     jnb PB6, default
     ret
 
 increment:
-
-    
     clr c
-    subb a, #255 ; if less than 255 carry is set
-    jnc check_button4_done
+    ;subb b, #255 ; if less than 255 carry is set
+    ;jnc check_button4_done
 
-    ;cjne a, #255, check_button4_done
+    cjne a, #255, check_button4_done
     mov a, #0
     ret
 
 decrement:
 
     clr c
-    subb a, #255 ; if less than 255 carry is set
-    jnc check_button5_done
+    ;subb a, #255 ; if less than 255 carry is set
+    ;jnc check_button5_done
 
 
-    ;cjne a, #0, check_button5_done
+    cjne a, #0, check_button5_done
     mov a, #255
     ret
 
@@ -114,16 +115,19 @@ default:
     mov soak_time, #60
     mov reflow_temp, #220
     mov reflow_time, #60
+    Wait_Milli_Seconds(#255)
     ret
 
 check_button4_done:
-    ADDC a, #0x01     ;if PB4 is pressed, increment a
+    ADDC a, #1     ;if PB4 is pressed, increment a
     da a
+    Wait_Milli_Seconds(#255)
     ret
 
 check_button5_done:
-    subb a, #0x01     ;if PB5 is pressed, increment a
+    subb a, #1     ;if PB5 is pressed, increment a
     da a
+    Wait_Milli_Seconds(#255)
     ret
 
 
