@@ -45,7 +45,41 @@ Start_Saying_Things_From_BCD:
 	push ar0
 	push ar1
 	mov r0, #0
+	mov a, r0
+	cjne a, talker_counter, skip_state_call
+Check_States_Talk:	
+	mov a, state
+	cjne a, #0, pass_state_0
+		ljmp skip_state_call
+	pass_state_0:
+	cjne a, #1, pass_state_1
+		mov a, #30
+		ljmp pass_state_call
+	pass_state_1:
+	cjne a, #2, pass_state_2
+		mov a, #31
+		ljmp pass_state_call
+	pass_state_2:
+	cjne a, #3, pass_state_3
+		mov a, #33
+		ljmp pass_state_call
+	pass_state_3:
+	cjne a, #4, pass_state_4
+		mov a, #29
+		ljmp pass_state_call
+	pass_state_4:
+	cjne a, #5, pass_state_5	
+		mov a, #32
+		ljmp pass_state_call
+	pass_state_5:
+	pass_state_call:
+		lcall Play_Numbered
+		inc talker_counter
+		ljmp End_Talking
+	skip_state_call:
+
 	mov a, temp_bcd+1
+	inc r0
 	jz Tens_Sound_No_Hundred ; if we're under 100 then go to printing the lower digits
 Number_Of_Hundreds:
 	mov r1, a
