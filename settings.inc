@@ -135,7 +135,7 @@ update_lcd_param:
     Set_Cursor(1,1)
     Send_Constant_String(#param0message)
     Set_Cursor(1,14)
-    Display_char(#11011111b)
+    ;Display_char(#11011111b)
     ;lcall ?WriteCommand
     Set_Cursor(1,15)
     Send_Constant_String(#param4message)

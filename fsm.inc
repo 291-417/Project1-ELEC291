@@ -40,6 +40,9 @@ state1:
 continue_state1:
     lcall divsadtimes
     mov a, temp_truncated
+    mov b, a
+    lcall SendHex
+    mov a, b
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
@@ -111,15 +114,43 @@ abort_error:
     mov state, #0
     ret
 
-divsadtimes:
-    mov x+0, totaltemp+0
-    mov x+1, totaltemp+1
-    mov x+2, totaltemp+2
-    mov x+3, totaltemp+3
-    load_Y(100)
-    lcall div32
+MOVATT MAC
+    mov a, totaltemp+%0
+    mov x+%0, a
+ENDMAC
 
-    mov temp_truncated, x+0
+divsadtimes:
+    ;MOVATT(0)
+    ;MOVATT(1)
+    ;MOVATT(2)
+    ;MOVATT(3)
+    ;load_Y(100)
+    ;lcall div32
+    ;mov a, x+0
+    ;mov temp_truncated, a
+    ;lcall hex2bcd
+    ;mov temp_truncated, bcd+1
+    push ar0
+    push acc
+    
+    mov a, temp_bcd+0
+    anl a, #0x0f
+    mov r0, a
+    mov a, temp_bcd+0
+    anl a, #0xf0
+    swap a
+    mov b, #10
+    mul ab
+    add a, r0
+    mov r0, a
+    mov a, temp_bcd+1
+    anl a, #0x0f
+    mov b, #100
+    mul ab
+    add a, r0
+    mov temp_truncated, a
+    pop acc
+    pop ar0
     ret
 
 
