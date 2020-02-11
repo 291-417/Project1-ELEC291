@@ -217,7 +217,8 @@ next:
   
   ;mov dptr, #Thermocouple
 	;lcall SendString
-  
+  mov b, state_time
+  lcall SendHex
   jb Abort, moveon
   jnb ABort, $  
   mov a, state

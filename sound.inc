@@ -26,7 +26,7 @@ Say_Stuff_FSM:
 	ret
 Say_Stuff_FSM_Begin_Saying_Things:
 	mov a, state_time
-	mov b, #15
+	mov b, #7
 	div ab
 	mov a, b
 	jnz End_Say_Stuff_FSM

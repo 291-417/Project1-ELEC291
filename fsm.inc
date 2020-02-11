@@ -44,9 +44,6 @@ state1:
 continue_state1:
     lcall divsadtimes
     mov a, temp_truncated
-    mov b, a
-    lcall SendHex
-    mov a, temp_truncated
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
@@ -181,6 +178,7 @@ update_lcd:
     ;mov x+2, #0
     ;mov x+3, #0
     ;lcall hex2bcd
+    ;Set_Cursor(2,10)
     ;Display_BCD(bcd+0)
     mov a, state
     cjne a, #0, check_state1
