@@ -49,10 +49,10 @@ dseg at 30H
   temp_truncated: ds 1
   temp_bcd: ds 2
   param_state: ds 1
-  soak_temp: ds 1
-  soak_time: ds 1
-  reflow_temp: ds 1
-  reflow_time: ds 1
+  soak_temp: ds 2
+  soak_time: ds 2
+  reflow_temp: ds 2
+  reflow_time: ds 2
 bseg
 
 mf: dbit 1
