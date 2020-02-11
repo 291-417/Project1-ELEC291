@@ -1,4 +1,4 @@
-TIMER1_RATE   EQU 1000 ; should fire every millisecond
+TIMER1_RATE   EQU 500 ; should fire every millisecond
 TIMER1_RELOAD EQU ((65536-(CLK/(2*TIMER0_RATE))))
 
 ;---------------------------------;
@@ -36,9 +36,9 @@ Timer1_ISR:
 	inc Count1ms+1
 Inc_Done:
   mov a, Count1ms+0
-  cjne a, #low(1000), Timer1_ISR_done
+  cjne a, #low(2000), Timer1_ISR_done
   mov a, Count1ms+1
-  cjne a, #high(1000), Timer1_ISR_done
+  cjne a, #high(2000), Timer1_ISR_done
   ; 1000 milliseconds have passed.  Set a flag so the main program knows
 	setb second_flag ; Let the main program know half second had passed
   mov Count1ms+0, #0
