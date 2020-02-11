@@ -26,6 +26,7 @@ PLAY_BUTTON equ P0.3
 SOUND equ P2.7
 PWM_PIN equ P0.2
 STARTSTOP equ P2.1
+ABORT equ P0.1
 
 FLASH_CE    EQU P2.4
 
@@ -198,14 +199,19 @@ forever:
 	lcall settings
   sjmp forever
 next:
-  mov dptr, #Temp
+  ;mov dptr, #Temp
 	;lcall SendString
   
-  mov dptr, #Thermocouple
+  ;mov dptr, #Thermocouple
 	;lcall SendString
   
-  
-  
+  jb Abort, moveon
+  jnb ABort, $  
+  mov a, state
+  jz moveon
+  mov state, #0x0 
+ 
+moveon:
   lcall ADC_to_PB
   lcall fsm_update
   lcall update_lcd

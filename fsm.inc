@@ -17,15 +17,16 @@ mov a, state
 
 state0:
     cjne a, #0, state1 ; check if in state 0
+    mov overall_time+0, #0x0
+    mov overall_time+1, #0x0
+    mov state_time, #0x0
     Set_PWM_Percentage(#0) ; power set to zero
     jnb STARTSTOP, state0_done
     Wait_Milli_Seconds(#50)
     jnb STARTSTOP, state0_done
     jb STARTSTOP, $
-    mov overall_time+0, #0x0
-    mov overall_time+1, #0x0
-    mov state_time, #0x0
     mov state, #1
+    mov state_time, #0x0
 state0_done:
     ret
 
@@ -42,7 +43,7 @@ continue_state1:
     mov a, temp_truncated
     mov b, a
     lcall SendHex
-    mov a, b
+    mov a, temp_truncated
     clr c
     subb a, #150 ; if less that 150 carry is set
     jc state1_done
@@ -154,7 +155,7 @@ divsadtimes:
     ret
 
 
-
+runningTimeMessage: db 'Overall: ', 0
 state0message: db 'Waiting...', 0
 state1message: db 'Ramp Soak ', 0
 state2message: db 'Preheat', 0
@@ -166,6 +167,14 @@ clear:  db '                                   ', 0
 update_lcd:
     ;Set_Cursor(1,1)
     ;Send_Constant_String(#clear)
+    Set_Cursor(2,1)
+    Send_Constant_String(#runningTimeMessage)
+    ;mov x+0, state_time
+    ;mov x+1, #0
+    ;mov x+2, #0
+    ;mov x+3, #0
+    ;lcall hex2bcd
+    ;Display_BCD(bcd+0)
     mov a, state
     cjne a, #0, check_state1
     Set_Cursor(1,1)
