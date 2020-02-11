@@ -40,10 +40,12 @@ L1: djnz R0, L1 ; 2 cycles->2*271.26ns*184=100us
 ; Toggles the 'E' pin in the LCD  ;
 ;---------------------------------;
 LCD_pulse:
+	clr EA
 	setb LCD_E
 	lcall Wait40uSec
 	clr LCD_E
     lcall Wait40uSec
+		setb EA
     ret
 
 ;---------------------------------;
