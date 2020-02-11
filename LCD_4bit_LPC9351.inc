@@ -53,7 +53,7 @@ LCD_pulse:
 ;---------------------------------;
 LCD_byte:
 	; Write high 4 bits first
-	clr EA
+	;clr EA
 	mov c, ACC.7
 	mov LCD_D7, c
 	mov c, ACC.6
@@ -73,7 +73,7 @@ LCD_byte:
 	mov c, ACC.0
 	mov LCD_D4, c
     lcall LCD_pulse
-		setb EA
+		;setb EA
 	ret
 
 ;---------------------------------;

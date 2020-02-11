@@ -217,8 +217,8 @@ next:
   
   ;mov dptr, #Thermocouple
 	;lcall SendString
-  mov b, state_time
-  lcall SendHex
+  ;mov b, state_time
+  ;lcall SendHex
   jb Abort, moveon
   jnb ABort, $  
   mov a, state
@@ -226,6 +226,13 @@ next:
   mov state, #0x0 
  
 moveon:
+  ;mov a, temp_truncated
+  ;clr c
+  ;subb a, #250
+  ;jc moveon2
+  ;mov state, #0
+  ;clr SOUND
+moveon2:
   lcall ADC_to_PB
   lcall fsm_update
   lcall update_lcd
