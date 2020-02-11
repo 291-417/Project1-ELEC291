@@ -65,6 +65,7 @@ pstate2:
     lcall update_lcd_param
     mov a, reflow_temp
     mov b, reflow_temp
+
     lcall check_increment
     mov reflow_temp, a
 
@@ -85,29 +86,28 @@ pstate3_done:
 
 
 check_increment:
-    jnb PB4, increment
-    jnb PB5, decrement
+    jnb PB4, decrement
+    jnb PB5, increment
     jnb PB6, default
     ret
 
 increment:
     clr c
-    ;subb b, #255 ; if less than 255 carry is set
-    ;jnc check_button4_done
-
-    cjne a, #255, check_button4_done
+    subb a, #255 ; if less than 255 carry is set
+    mov a, b
+    jc check_button4_done
     mov a, #0
+    ;cjne a, #255, check_button4_done
     ret
 
 decrement:
-
     clr c
     ;subb a, #255 ; if less than 255 carry is set
-    ;jnc check_button5_done
-
-
-    cjne a, #0, check_button5_done
+    ;mov a, b
+    ljmp check_button5_done
     mov a, #255
+
+    ;cjne a, #0, check_button5_done
     ret
 
 default:
@@ -115,26 +115,26 @@ default:
     mov soak_time, #60
     mov reflow_temp, #220
     mov reflow_time, #60
-    Wait_Milli_Seconds(#255)
+    Wait_Milli_Seconds(#155)
     ret
 
 check_button4_done:
-    ADDC a, #1     ;if PB4 is pressed, increment a
-    da a
-    Wait_Milli_Seconds(#255)
+    add a, #0x01
+	;da a
+    Wait_Milli_Seconds(#155)
     ret
 
 check_button5_done:
-    subb a, #1     ;if PB5 is pressed, increment a
-    da a
-    Wait_Milli_Seconds(#255)
+    add a, #0xFF   ;if PB5 is pressed, increment a
+    ;da a
+    Wait_Milli_Seconds(#155)
     ret
 
 
 param0message: db 'Soak Temp   ', 0
 param1message: db 'Soak Time   ', 0
-param2message: db 'Reflow Temp ', 0
-param3message: db 'Reflow Time ', 0
+param2message: db 'Reflow Temp', 0
+param3message: db 'Reflow Time', 0
 param4message: db 'C ', 0
 param5message: db ' s ', 0
 
@@ -150,9 +150,19 @@ update_lcd_param:
     ;lcall ?WriteCommand
     Set_Cursor(1,15)
     Send_Constant_String(#param4message)
+
     Set_Cursor(2,1)
-    Display_BCD(soak_temp)
+    mov x+0, soak_temp
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+
+    lcall hex2bcd
+    lcall LCD_3BCD
+    
+    ;Display_BCD(soak_temp)
     ret
+
  check_state1_param:  
     cjne a, #1, check_state2_param
     Set_Cursor(1,1)
@@ -160,9 +170,18 @@ update_lcd_param:
     Set_Cursor(1,14)
     ;lcall ?WriteCommand
     Send_Constant_String(#param5message)
+    ;Set_Cursor(2,3)
+    ;Display_BCD(soak_time)
     Set_Cursor(2,1)
-    Display_BCD(soak_time)  
-    ret    
+    mov x+0, soak_time
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+
+    lcall hex2bcd
+    lcall LCD_3BCD
+    ret  
+
 check_state2_param:
     cjne a, #2, check_state3_param
     Set_Cursor(1,1)
@@ -173,8 +192,14 @@ check_state2_param:
     ;lcall ?WriteCommand
     Send_Constant_String(#param4message)
     Set_Cursor(2,1)
-    Display_BCD(reflow_temp)  
+    mov x+0, reflow_temp
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+    lcall hex2bcd
+    lcall LCD_3BCD
     ret    
+
 check_state3_param:
     Set_Cursor(1,1)
     Send_Constant_String(#param3message)
@@ -182,7 +207,13 @@ check_state3_param:
     ;lcall ?WriteCommand
     Send_Constant_String(#param5message)
     Set_Cursor(2,1)
-    Display_BCD(reflow_time)  
+    mov x+0, reflow_time
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+    
+    lcall hex2bcd
+    lcall LCD_3BCD
     ret 
 
 end

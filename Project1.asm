@@ -49,10 +49,10 @@ dseg at 30H
   temp_truncated: ds 1
   temp_bcd: ds 2
   param_state: ds 1
-  soak_temp: ds 2
-  soak_time: ds 2
-  reflow_temp: ds 2
-  reflow_time: ds 2
+  soak_temp: ds 1
+  soak_time: ds 1
+  reflow_temp: ds 1
+  reflow_time: ds 1
 bseg
 
 mf: dbit 1
@@ -165,11 +165,15 @@ MainProgram:
 
   mov state, #0
   mov param_state, #0
+
   mov soak_temp, #0
+  mov soak_temp+1, #0
   mov soak_time, #0
+  mov soak_time+1, #0
   mov reflow_temp, #0
+  mov reflow_temp+1, #0
   mov reflow_time, #0
-  
+  mov reflow_time+1, #0
 
   
   lcall Sound_Start_Init
