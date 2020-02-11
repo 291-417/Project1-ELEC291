@@ -18,7 +18,7 @@ ERASE_BLOCK      EQU 0xd8  ; Address:3 Dummy:0 Num:0
 READ_DEVICE_ID   EQU 0x9f  ; Address:0 Dummy:2 Num:1 to infinite
 
 cseg
-$include(obamaindex.inc)
+$include(obamaindex_new.inc)
 
 Say_Stuff_FSM:
 	mov a, state
