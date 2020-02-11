@@ -20,7 +20,9 @@ state0:
     mov overall_time+0, #0x0
     mov overall_time+1, #0x0
     mov state_time, #0x0
-    Set_PWM_Percentage(#0) ; power set to zero
+    ;Set_PWM_Percentage(#0) ; power set to zero
+    clr PWM_PIN
+    clr TR0 ; power set to zero
     jnb STARTSTOP, state0_done
     Wait_Milli_Seconds(#50)
     jnb STARTSTOP, state0_done
@@ -32,7 +34,8 @@ state0_done:
 
 state1:
     cjne a, #1, state2
-    Set_PWM_Percentage(#100) ; power set to 100%
+    clr TR0
+    setb PWM_PIN ; power set to 100%
     lcall divsadtimes ; grabs temp into temp_truncated
     mov a, temp_truncated
     clr c
@@ -63,7 +66,8 @@ check_time_state1:
 
 state2:
     cjne a, #2, state3
-    Set_PWM_Percentage(#20)
+    mov pwm_percentage, #20
+    setb TR0
     mov a, state_time
     clr c
     subb a, #59 ; if less than 60 carry is set
@@ -75,7 +79,8 @@ state2_done:
 
 state3:
     cjne a, #3, state4
-    Set_PWM_Percentage(#100)
+    clr TR0
+    setb PWM_PIN
     lcall divsadtimes
     mov a, temp_truncated
     clr c
@@ -88,7 +93,8 @@ state3_done:
 
 state4:
     cjne a, #4, state5
-    Set_PWM_Percentage(#20)
+    mov pwm_percentage, #20
+    setb TR0
     mov a, state_time
     clr c
     subb a, #45 ; if less than 45 carry is set
@@ -100,7 +106,8 @@ state4_done:
 
 state5:
     cjne a, #5, abort_error
-    Set_PWM_Percentage(#0)
+    clr TR0
+    clr PWM_PIN
     lcall divsadtimes
     mov a, temp_truncated
     clr c

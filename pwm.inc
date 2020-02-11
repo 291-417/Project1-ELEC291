@@ -31,14 +31,13 @@ Timer0_Init:
 ; 2048 Hz square wave at pin P3.7 ;
 ;---------------------------------;
 Timer0_ISR:
-  reti
   push acc
   push ac
   mov TL0, #low(TIMER0_RELOAD)
   mov TH0, #high(TIMER0_RELOAD)
   dec pwm_counter
   mov a, pwm_counter
-  cjne a, #0, Return_From_PWM ; if pwm_counter is not zero, we still want to wait a few cycles; just return
+  jnz Return_From_PWM ; if pwm_counter is not zero, we still want to wait a few cycles; just return
   cpl PWM_PIN
   jnb PWM_PIN, PWM_Was_High
 PWM_Was_Low:
@@ -53,23 +52,5 @@ Return_From_PWM:
   pop ac
   pop acc
 	reti
-
-Set_PWM_Percentage MAC
-  mov a, %0
-  cjne a, #0, pwmmacNotZero%M
-  clr TR0
-  clr PWM_PIN
-  sjmp pwmmacEnd%M
-pwmmacNotZero%M:
-  cjne a, #MAX_PWM, pwmmacNotMax%M
-  clr TR0
-  setb PWM_PIN
-  sjmp pwmmacEnd%M
-pwmmacNotMax%M:
-  setb TR0
-  mov pwm_percentage, %0
-pwmmacEnd%M:
-  nop
-ENDMAC
 
 end
