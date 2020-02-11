@@ -153,12 +153,24 @@ Sound_Start_Init:
 MainProgram:
   mov SP, #0x7F
   
+  mov P0M1, #00H
+  mov P0M2, #00H
+  mov P1M1, #00H
+  mov P1M2, #00H ; WARNING: P1.2 and P1.3 need 1kohm pull-up resistors!
+  mov P2M1, #00H
+  mov P2M2, #00H
+  mov P3M1, #00H
+  mov P3M2, #00H
+
+
   mov state, #0
   mov param_state, #0
   mov soak_temp, #0
   mov soak_time, #0
   mov reflow_temp, #0
   mov reflow_time, #0
+  
+
   
   lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
@@ -187,18 +199,19 @@ MainProgram:
 
   lcall Wait1S ; Wait a bit so PUTTy has a chance to start
 
-  mov dptr, #InitialMessage
-	lcall SendString
-
   clr SOUND ; Disable speaker
   clr TMOD20 ; Stop CCU timer
 	setb EA ; Enable global interrupts.
 
 forever:
   jb DIP_BUTTON1, next
+  clr EA
+  lcall ADC_to_PB
 	lcall settings
   sjmp forever
+
 next:
+  setb EA
   ;mov dptr, #Temp
 	;lcall SendString
   
