@@ -73,7 +73,7 @@ pstate1:
     lcall update_lcd_param
     mov a, soak_time
     mov b, soak_time
-    
+
     lcall check_increment
     mov soak_time, a
 
@@ -247,7 +247,7 @@ check_state3_param:
     lcall LCD_3BCD
     ret 
 ;------------------------------------------ NOR -----------------------------------------
-Signature1: db 'Project 1, JCF  ', 0
+Signature1: db '     Project 1, JCF  ', 0
 Signature2: db 'Group: BA      ', 0
 
 ;10011101 <3
