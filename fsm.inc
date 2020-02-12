@@ -47,8 +47,8 @@ continue_state1:
     clr c
     subb a, soak_temp ; if less that soak_temp carry is set
     jc state1_done
-    mov dptr, #title
-	lcall SendString
+    ;mov dptr, #title
+	;lcall SendString
     mov state_time, #0
     mov state, #2
 state1_done:
