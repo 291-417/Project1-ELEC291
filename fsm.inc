@@ -181,7 +181,16 @@ update_lcd:
 
     lcall hex2bcd
     lcall LCD_3BCD
-    ;Display_BCD(bcd+0)
+
+    Set_Cursor(1,14)
+    mov x+0, state_time+0
+    mov x+1, state_time+1
+    mov x+2, #0
+    mov x+3, #0
+
+    lcall hex2bcd
+    lcall LCD_3BCD
+
     mov a, state
     cjne a, #0, check_state1
     Set_Cursor(1,1)
