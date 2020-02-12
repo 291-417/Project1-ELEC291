@@ -64,17 +64,6 @@ check_time_state1:
 state2:
     cjne a, #2, state3
 
-    Set_Cursor(1,10)            ;display soak time debugging 
-    
-    ;Set_Cursor(2,11)
-    mov x+0, soak_time
-    mov x+1, #0
-    mov x+2, #0
-    mov x+3, #0
-
-    lcall hex2bcd
-    lcall LCD_3BCD
-
     mov pwm_percentage, #20
     setb TR0
     mov a, state_time+0
