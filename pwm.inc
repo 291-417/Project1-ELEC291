@@ -32,7 +32,7 @@ Timer0_Init:
 ;---------------------------------;
 Timer0_ISR:
   push acc
-  push ac
+  push psw
   mov TL0, #low(TIMER0_RELOAD)
   mov TH0, #high(TIMER0_RELOAD)
   dec pwm_counter
@@ -49,7 +49,7 @@ PWM_Was_High:
   subb a, pwm_percentage
   mov pwm_counter, a
 Return_From_PWM:
-  pop ac
+  pop psw
   pop acc
 	reti
 

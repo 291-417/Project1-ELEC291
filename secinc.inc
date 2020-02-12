@@ -25,7 +25,7 @@ Timer1_Init:
 ;---------------------------------;
 Timer1_ISR:
   push acc
-  push ac
+  push psw
   mov TL1, #low(TIMER1_RELOAD)
   mov TH1, #high(TIMER1_RELOAD)
   
@@ -44,7 +44,7 @@ Inc_Done:
   mov Count1ms+0, #0
   mov Count1ms+1, #0
 Timer1_ISR_done:
-  pop ac
+  pop psw
   pop acc
   reti
 end

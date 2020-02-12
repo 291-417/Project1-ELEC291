@@ -123,7 +123,7 @@ state5:
     subb a, #60 ; if less than 60 carry is set
     jnc state5_done
     mov state_time, #0
-    mov state, #0
+    mov state, #0 
 state5_done:
     ret
 
