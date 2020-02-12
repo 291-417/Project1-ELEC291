@@ -141,11 +141,8 @@ abort_error:
     Send_Constant_String(#aborterrormessage)
     Set_Cursor(2,1)
     Send_Constant_String(#aborterrormessage2)
-    Wait_Milli_Seconds(#255)
-    Wait_Milli_Seconds(#255)
-    Wait_Milli_Seconds(#255)
     mov state, #0
-    ret
+    ljmp abort_error
 
 aborterrormessage: db 'Abort error', 0
 aborterrormessage2: db 'Returning to Wait', 0
