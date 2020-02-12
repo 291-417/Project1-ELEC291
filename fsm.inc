@@ -193,6 +193,10 @@ clear3:  db '   ', 0
 update_lcd:
     Set_Cursor(2,7)
     Send_Constant_String(#clear3)
+    Set_Cursor(2,10)
+    Send_Constant_String(#clear3)
+    Set_Cursor(2,11)
+    Send_Constant_String(#clear3)
 
     Set_Cursor(2,1)
     Send_Constant_String(#runningTimeMessage)

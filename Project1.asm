@@ -199,6 +199,8 @@ MainProgram:
   ; Set beginning message on LCD
   Set_Cursor(1, 1)
   Send_Constant_String(#Title)
+  Set_Cursor(2, 1)
+  Send_Constant_String(#Title2)
 
   lcall Wait1S ; Wait a bit so PUTTy has a chance to start
 

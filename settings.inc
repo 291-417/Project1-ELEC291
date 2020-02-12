@@ -162,6 +162,10 @@ check_state0_param_nor_jump:
 ;-----------------------------------------------------------------------
 
 Lan_and_line:
+    Set_Cursor(2,10)
+    Send_Constant_String(#clear3)
+    Set_Cursor(2,11)
+    Send_Constant_String(#clear3)
     Set_Cursor(2,9)
     Display_char(#01111100b)
     Set_Cursor(1,14)
@@ -247,7 +251,7 @@ check_state3_param:
     lcall LCD_3BCD
     ret 
 ;------------------------------------------ NOR -----------------------------------------
-Signature1: db '     Project 1, JCF  ', 0
+Signature1: db 'Project 1, JCF  ', 0
 Signature2: db 'Group: BA      ', 0
 
 ;10011101 <3
@@ -271,7 +275,7 @@ check_state1_param_nor_jump:
 ;---------------------------------------------------------------------------------------
 
 check_state0_param_nor:
-
+    
     mov a, language
     cjne a, #1, p00n_jump
     mov a, param_state

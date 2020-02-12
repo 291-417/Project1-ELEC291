@@ -199,7 +199,8 @@ ADC_to_PB_L0:
 
 
 
-Title: db 'Project 1', 0
+Title: db '      welcome to our', 0
+Title2: db '   Project  1', 0
 InitialMessage: db '\r\nADC0 push buttons.  The push buttons voltage divider is connected to P1.7\r\n', 0
 Thermocouple: db 'Thermocouple difference: ', 0
 Total: db 'Total Temp: ',0 
