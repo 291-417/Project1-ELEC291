@@ -171,7 +171,7 @@ MainProgram:
   mov soak_temp, #150
   mov soak_time, #60
   mov reflow_temp, #220
-  mov reflow_time, #60
+  mov reflow_time, #45
   mov language, #0
   
   lcall Sound_Start_Init
@@ -206,6 +206,9 @@ MainProgram:
   clr TMOD20 ; Stop CCU timer
 	setb EA ; Enable global interrupts.
 
+  mov a, #34
+  lcall Play_Numbered
+
 forever:
   jb DIP_BUTTON1, next
   clr EA
@@ -226,14 +229,6 @@ next:
   jnb ABort, $  
   mov a, state
   jz moveon
-  mov b, #0xDE
-  lcall SendHex
-  mov b, #0xAD
-  lcall SendHex
-  mov b, #0xBE
-  lcall SendHex
-  mov b, #0xEF ; DEBUG
-  lcall SendHex
   mov state, #0x0 
  
 moveon:
@@ -258,13 +253,13 @@ moveon2:
   Wait_Milli_Seconds(#1)
   ljmp forever
 Check_Temperatures:
-  mov dptr, #Total
-  lcall SendString
+  ;mov dptr, #Total
+  ;lcall SendString
   lcall Get_Thermocouple
   lcall Read_Temperature
   lcall get_total_temp
-  mov b, temp_truncated
-  lcall SendHex
+  ;mov b, temp_truncated
+  ;lcall SendHex
   ljmp Every_Second_2
 
 
@@ -276,10 +271,10 @@ Every_Second_Stuff:
   ;mov bcd+1, #0x02
   ;mov bcd+0, #0x53
   clr second_flag
-  mov b, state_time
-  lcall SendHex
-  mov b, reflow_time
-  lcall SendHex
+  ;mov b, state_time
+  ;lcall SendHex
+  ;mov b, reflow_time
+  ;lcall SendHex
   Set_Cursor(1,1)
   Send_Constant_String(#clear)
   Set_Cursor(2,1)
