@@ -23,11 +23,6 @@ $include(obamaindex_new.inc)
 Say_Stuff_FSM:
 	mov a, state
 
-	mov Talk_temp+0, temp_bcd+0
-	mov Talk_temp+1, temp_bcd+1
-	mov Talk_temp+2, temp_bcd+2
-	mov Talk_temp+3, temp_bcd+3
-
 	jnz Say_Stuff_FSM_Begin_Saying_Things
 	;mov a, #36
 	;lcall Play_Numbered
@@ -38,6 +33,8 @@ Say_Stuff_FSM_Begin_Saying_Things:
 	div ab
 	mov a, b
 	jnz End_Say_Stuff_FSM
+	mov Talk_temp+0, temp_bcd+0
+	mov Talk_temp+1, temp_bcd+1
 	setb say_a_number
 End_Say_Stuff_FSM:
 	ret

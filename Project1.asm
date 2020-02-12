@@ -226,6 +226,14 @@ next:
   jnb ABort, $  
   mov a, state
   jz moveon
+  mov b, #0xDE
+  lcall SendHex
+  mov b, #0xAD
+  lcall SendHex
+  mov b, #0xBE
+  lcall SendHex
+  mov b, #0xEF ; DEBUG
+  lcall SendHex
   mov state, #0x0 
  
 moveon:
