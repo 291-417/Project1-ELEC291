@@ -66,7 +66,6 @@ state2:
 
     Set_Cursor(1,11)            ;display soak time debugging 
     
-    Set_Cursor(2,11)
     mov x+0, soak_time
     mov x+1, #0
     mov x+2, #0
@@ -138,8 +137,19 @@ state5_done:
     ret
 
 abort_error:
+    Set_Cursor(1,1)                         ;debugging 
+    Send_Constant_String(#aborterrormessage)
+    Set_Cursor(2,1)
+    Send_Constant_String(#aborterrormessage2)
+    Wait_Milli_Seconds(#255)
+    Wait_Milli_Seconds(#255)
+    Wait_Milli_Seconds(#255)
     mov state, #0
     ret
+
+aborterrormessage: db 'Abort error', 0
+aborterrormessage2: db 'Returning to Wait', 0
+
 
 MOVATT MAC
     mov a, totaltemp+%0
