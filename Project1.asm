@@ -39,7 +39,7 @@ dseg at 30H
   pwm_percentage: ds 1
   state: ds 1
   overall_time: ds 2
-  state_time: ds 1
+  state_time: ds 2
   lmtemp: ds 4
   thermotemp: ds 4
   totaltemp: ds 4
@@ -188,7 +188,8 @@ MainProgram:
   lcall InitADC0
   lcall LCD_4BIT
 
-	mov state_time, #0
+  mov state_time+0, #0
+	mov state_time+1, #0
 	mov overall_time+0, #0
 	mov overall_time+1, #0
   mov temp_truncated, #0
