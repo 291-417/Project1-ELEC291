@@ -73,6 +73,7 @@ pstate1:
     lcall update_lcd_param
     mov a, soak_time
     mov b, soak_time
+    
     lcall check_increment
     mov soak_time, a
 
@@ -141,7 +142,7 @@ param1message: db 'Soak Time    ', 0
 param2message: db 'Reflow Temp  ', 0
 param3message: db 'Reflow Time  ', 0
 param4message: db 'C   ', 0
-param5message: db 's   ', 0
+param5message: db 's    ', 0
 spacebar: db ' ', 0 
 
 param0messageNor: db 'Bl', 0
@@ -167,9 +168,7 @@ Lan_and_line:
     Send_Constant_String(#param6message)
     ret
 
-
 update_lcd_param:
-    
     mov a, language
     cjne a, #0, check_state0_param_nor_jump
 
@@ -191,7 +190,6 @@ update_lcd_param:
 
     lcall hex2bcd
     lcall LCD_3BCD
-    
     ret
 
  check_state1_param:  
@@ -223,6 +221,7 @@ check_state2_param:
 
     Send_Constant_String(#param4message)
     Set_Cursor(2,1)
+
     mov x+0, reflow_temp
     mov x+1, #0
     mov x+2, #0

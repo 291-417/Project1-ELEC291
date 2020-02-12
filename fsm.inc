@@ -87,7 +87,7 @@ state3:
     mov state, #4
 state3_done:
     ret
-
+;                           REFLOW state
 state4:
     cjne a, #4, state5
     mov pwm_percentage, #20
@@ -159,7 +159,7 @@ divsadtimes:
     ret
 
 
-runningTimeMessage: db 'Overall: ', 0
+runningTimeMessage: db 'Overall Time: ', 0
 state0message: db 'Waiting...', 0
 state1message: db 'Ramp Soak ', 0
 state2message: db 'Preheat', 0
@@ -173,12 +173,14 @@ update_lcd:
     ;Send_Constant_String(#clear)
     Set_Cursor(2,1)
     Send_Constant_String(#runningTimeMessage)
-    ;mov x+0, state_time
-    ;mov x+1, #0
-    ;mov x+2, #0
-    ;mov x+3, #0
-    ;lcall hex2bcd
-    ;Set_Cursor(2,10)
+    Set_Cursor(2,14)
+    mov x+0, overall_time+0
+    mov x+1, overall_time+1
+    mov x+2, #0
+    mov x+3, #0
+
+    lcall hex2bcd
+    lcall LCD_3BCD
     ;Display_BCD(bcd+0)
     mov a, state
     cjne a, #0, check_state1
