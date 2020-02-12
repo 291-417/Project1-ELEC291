@@ -240,11 +240,12 @@ moveon2:
 	;lcall Wait1S
 	
   jb second_flag, Every_Second_Stuff
-  ;jb PLAY_BUTTON, forever
+  jb PLAY_BUTTON, forever
   ;Wait_Milli_Seconds(#50)
   ;jb PLAY_BUTTON, forever
-  ;jnb PLAY_BUTTON, $
-  
+  jnb PLAY_BUTTON, $
+  lcall LCD_4BIT
+  Wait_Milli_Seconds(#1)
   ljmp forever
 Check_Temperatures:
   mov dptr, #Total
@@ -252,6 +253,8 @@ Check_Temperatures:
   lcall Get_Thermocouple
   lcall Read_Temperature
   lcall get_total_temp
+  mov b, temp_truncated
+  lcall SendHex
   ljmp Every_Second_2
 
 
@@ -263,11 +266,16 @@ Every_Second_Stuff:
   ;mov bcd+1, #0x02
   ;mov bcd+0, #0x53
   clr second_flag
+  mov b, state_time
+  lcall SendHex
+  mov b, reflow_time
+  lcall SendHex
   Set_Cursor(1,1)
   Send_Constant_String(#clear)
   Set_Cursor(2,1)
   Send_Constant_String(#clear)
-  jnb say_a_number, Check_Temperatures
+  ljmp Check_Temperatures
+  ;jnb say_a_number, Check_Temperatures
 Every_Second_2:
   lcall BCD_To_Sound
   lcall Say_Stuff_FSM

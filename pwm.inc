@@ -1,4 +1,4 @@
-TIMER0_RATE   EQU 2048     ; 2048Hz squarewave (peak amplitude of CEM-1203 speaker)
+TIMER0_RATE   EQU 250     ; 2048Hz squarewave (peak amplitude of CEM-1203 speaker)
 TIMER0_RELOAD EQU ((65536-(CLK/(2*TIMER0_RATE))))
 DEFAULT_PWM EQU 10 ; Make sure to set PWM in range from 1-99
 MAX_PWM EQU 100

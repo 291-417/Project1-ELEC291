@@ -65,10 +65,10 @@ state2:
     cjne a, #2, state3
     mov pwm_percentage, #20
     setb TR0
-    mov a, state_time
+    mov a, soak_time
     clr c
-    subb a, soak_time ; if less than soak_time carry is set
-    jc state2_done
+    subb a, state_time ; if less than soak_time carry is set
+    jnc state2_done
     mov state, #3
     mov state_time, #0
 state2_done:    
@@ -92,10 +92,10 @@ state4:
     cjne a, #4, state5
     mov pwm_percentage, #20
     setb TR0
-    mov a, state_time
+    mov a, reflow_time
     clr c
-    subb a, reflow_time ; if less than 45 carry is set
-    jc state4_done
+    subb a, state_time ; if less than 45 carry is set
+    jnc state4_done
     mov state_time, #0
     mov state, #5
 state4_done:
@@ -109,7 +109,7 @@ state5:
     mov a, temp_truncated
     clr c
     subb a, #60 ; if less than 60 carry is set
-    jc state5_done
+    jnc state5_done
     mov state_time, #0
     mov state, #0
 state5_done:
