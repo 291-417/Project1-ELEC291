@@ -268,6 +268,8 @@ Every_Second_Stuff:
   clr second_flag
   mov b, state_time
   lcall SendHex
+  mov b, reflow_time
+  lcall SendHex
   Set_Cursor(1,1)
   Send_Constant_String(#clear)
   Set_Cursor(2,1)
