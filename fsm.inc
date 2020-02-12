@@ -213,15 +213,19 @@ update_lcd:
     mov x+3, #0
     lcall hex2bcd
     lcall LCD_3BCD
-    
-    Set_Cursor(1,14)
-    mov bcd+0, temp_bcd+0
-    mov bcd+1, temp_bcd+1
-    mov bcd+2, #0
-    mov bcd+3, #0
 
-    ;lcall hex2bcd
+    Set_Cursor(1,12)
+    mov x+0, temp_bcd+0
+    mov x+1, temp_bcd+1
+    mov x+2, #0
+    mov x+3, #0
+    lcall hex2bcd
     lcall LCD_3BCD
+
+    Set_Cursor(1,15)
+    Display_char(#11011111b)
+    Set_Cursor(1,16)
+    Send_Constant_String(#param4message)
 
     mov a, state
     cjne a, #0, check_state1
