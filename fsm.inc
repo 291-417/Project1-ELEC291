@@ -64,7 +64,7 @@ check_time_state1:
 state2:
     cjne a, #2, state3
 
-    Set_Cursor(1,11)            ;display soak time debugging 
+    Set_Cursor(1,10)            ;display soak time debugging 
     
     mov x+0, soak_time
     mov x+1, #0
@@ -117,16 +117,6 @@ state5:
     clr TR0
     clr PWM_PIN
     lcall divsadtimes
-
-    Set_Cursor(2,11)            ;debugging ouput
-    mov x+0, temp_truncated
-    mov x+1, #0
-    mov x+2, #0
-    mov x+3, #0
-
-    lcall hex2bcd
-    lcall LCD_3BCD
-
     mov a, temp_truncated
     clr c
     subb a, #60 ; if less than 60 carry is set
