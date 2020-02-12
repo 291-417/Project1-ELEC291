@@ -4,6 +4,8 @@
 ; state2: Reflow Temp
 ; state3: Reflow Time
 
+param6message: db 'LAN', 0
+
 state_change0:
     mov param_state, #0
     ljmp pstate0
@@ -20,20 +22,39 @@ state_change3:
     mov param_state, #3
     ljmp pstate0
 
+lang_change:
+    mov a, language
+    clr c
+    subb a, #3      ;if less than 3, carry is set
+    jnc reset_lan
+    mov a, language
+    add a, #0x01
+    mov language, a
+    
+    Wait_Milli_Seconds(#255)
+    Wait_Milli_Seconds(#255)
+    ljmp pstate0
 
+reset_lan:
+    Wait_Milli_Seconds(#255)
+    Wait_Milli_Seconds(#255)
+    mov language, #0x00
+    ljmp pstate0
 
 settings:                   ;MAIN CODE START
-clr a
-mov a, param_state
-Set_Cursor(2,14)
-Display_BCD(param_state) 
+lcall langfsm
+mov a, param_state 
+Set_Cursor(1,14)
+Send_Constant_String(#param6message)
+
+
 
 lcall ADC_to_PB
 jnb PB0, state_change0
 jnb PB1, state_change1
 jnb PB2, state_change2
 jnb PB3, state_change3
-
+jnb PB6, lang_change
 
 
 
@@ -129,26 +150,44 @@ check_button5_done:
     ;da a
     Wait_Milli_Seconds(#155)
     ret
-
+;-----------------------------------------------------------------------
 
 param0message: db 'Soak Temp   ', 0
 param1message: db 'Soak Time   ', 0
 param2message: db 'Reflow Temp', 0
 param3message: db 'Reflow Time', 0
 param4message: db 'C ', 0
-param5message: db ' s ', 0
+param5message: db 's ', 0
+spacebar: db ' ', 0
 
+param0messageNor: db 'Bløt Temp    ', 0
+param1messageNor: db 'Bløt Tid     ', 0
+param2messageNor: db 'Gjenflyt Temp', 0
+param3messageNor: db 'Gjenflyt Time', 0
+param4messageNor: db 'C ', 0
+param5messageNor: db 's ', 0
+
+check_state0_param_nor_jump:
+    ljmp check_state0_param_nor
+;-----------------------------------------------------------------------
 update_lcd_param:
-    ;Set_Cursor(1,1)
-    ;Send_Constant_String(#clear)
+    Set_Cursor(1,11)
+    Display_char(#01111100b)                    ;divisors for language
+
+    Set_Cursor(2,11)
+    Display_char(#01111100b)
+
+    mov a, language
+    cjne a, #0, check_state0_param_nor_jump
+
     mov a, param_state
     cjne a, #0, check_state1_param
     Set_Cursor(1,1)
     Send_Constant_String(#param0message)
-    Set_Cursor(1,14)
+    Set_Cursor(2,4)
     Display_char(#11011111b)
     ;lcall ?WriteCommand
-    Set_Cursor(1,15)
+    Set_Cursor(2,5)
     Send_Constant_String(#param4message)
 
     Set_Cursor(2,1)
@@ -160,18 +199,14 @@ update_lcd_param:
     lcall hex2bcd
     lcall LCD_3BCD
     
-    ;Display_BCD(soak_temp)
     ret
 
  check_state1_param:  
     cjne a, #1, check_state2_param
     Set_Cursor(1,1)
     Send_Constant_String(#param1message)
-    Set_Cursor(1,14)
-    ;lcall ?WriteCommand
+    Set_Cursor(2,4)
     Send_Constant_String(#param5message)
-    ;Set_Cursor(2,3)
-    ;Display_BCD(soak_time)
     Set_Cursor(2,1)
     mov x+0, soak_time
     mov x+1, #0
@@ -186,9 +221,9 @@ check_state2_param:
     cjne a, #2, check_state3_param
     Set_Cursor(1,1)
     Send_Constant_String(#param2message)
-    Set_Cursor(1,14)
+    Set_Cursor(2,4)
     Display_char(#11011111b)
-    Set_Cursor(1,15)
+    Set_Cursor(2,5)
     ;lcall ?WriteCommand
     Send_Constant_String(#param4message)
     Set_Cursor(2,1)
@@ -203,7 +238,7 @@ check_state2_param:
 check_state3_param:
     Set_Cursor(1,1)
     Send_Constant_String(#param3message)
-    Set_Cursor(1,14)
+    Set_Cursor(2,4)
     ;lcall ?WriteCommand
     Send_Constant_String(#param5message)
     Set_Cursor(2,1)
@@ -215,5 +250,100 @@ check_state3_param:
     lcall hex2bcd
     lcall LCD_3BCD
     ret 
+
+check_state0_param_nor:
+    mov a, param_state
+    cjne a, #0, check_state1_param_nor
+
+    Set_Cursor(1,1)
+    Send_Constant_String(#param0messageNor)
+    Set_Cursor(2,4)
+    Display_char(#11011111b)
+    ;lcall ?WriteCommand
+    Set_Cursor(2,5)
+    Send_Constant_String(#param4messageNor)
+
+    Set_Cursor(2,1)
+    mov x+0, soak_temp
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+
+    lcall hex2bcd
+    lcall LCD_3BCD
+    
+
+check_state1_param_nor:  
+    mov a, language
+    cjne a, #0, check_state2_param_nor
+    Set_Cursor(1,1)
+    Send_Constant_String(#param1messageNor)
+    Set_Cursor(2,4)
+    Send_Constant_String(#param5messageNor)
+    Set_Cursor(2,1)
+    
+    lcall hex2bcd
+    lcall LCD_3BCD
+    ret  
+
+check_state2_param_nor:
+    cjne a, #2, check_state3_param_nor
+    Set_Cursor(1,1)
+    Send_Constant_String(#param2messageNor)
+    Set_Cursor(2,4)
+    Display_char(#11011111b)
+    Set_Cursor(2,5)
+    ;lcall ?WriteCommand
+    Send_Constant_String(#param4messageNor)
+    Set_Cursor(2,1)
+    mov x+0, reflow_temp
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+    lcall hex2bcd
+    lcall LCD_3BCD
+    ret    
+
+check_state3_param_nor:
+    Set_Cursor(1,1)
+    Send_Constant_String(#param3messageNor)
+    Set_Cursor(2,4)
+    ;lcall ?WriteCommand
+    Send_Constant_String(#param5messageNor)
+    Set_Cursor(2,1)
+    mov x+0, reflow_time
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+    
+    lcall hex2bcd
+    lcall LCD_3BCD
+    ret 
+
+;------------------------------------------------------------------------------
+language1: db ' Eng', 0
+language2: db ' Nor', 0
+language3: db 'p00n', 0
+
+langfsm:
+    mov a, language
+    cjne a, #0, lang2 ; check if in state 0
+    Set_Cursor(2,13)
+    Send_Constant_String(#language1)
+    ret
+
+lang2:
+    cjne a, #1, lang3 ; check if in state 1
+    Set_Cursor(2,13)
+    Send_Constant_String(#language2)
+    ret
+
+lang3:                 ;then state 2
+    Set_Cursor(2,13)
+    Send_Constant_String(#language3)
+    ret
+
+
+
 
 end

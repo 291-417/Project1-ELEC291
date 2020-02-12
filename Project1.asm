@@ -53,6 +53,7 @@ dseg at 30H
   soak_time: ds 1
   reflow_temp: ds 1
   reflow_time: ds 1
+  language: ds 1
 bseg
 
 mf: dbit 1
@@ -167,14 +168,10 @@ MainProgram:
   mov param_state, #0
 
   mov soak_temp, #0
-  mov soak_temp+1, #0
   mov soak_time, #0
-  mov soak_time+1, #0
   mov reflow_temp, #0
-  mov reflow_temp+1, #0
   mov reflow_time, #0
-  mov reflow_time+1, #0
-
+  mov language, #0
   
   lcall Sound_Start_Init
   lcall Ports_Init ; Default all pins as bidirectional I/O. See Table 42.
