@@ -178,35 +178,46 @@ divsadtimes:
     ret
 
 
-runningTimeMessage: db 'Overall Time: ', 0
+runningTimeMessage: db 'OT:', 0
+stateTimeMessage: db 'ST:', 0
 state0message: db 'Waiting...', 0
-state1message: db 'Ramp Soak ', 0
+state1message: db 'Ramp Soak', 0
 state2message: db 'Preheat', 0
 state3message: db 'Peak Ramp', 0
 state4message: db 'Reflow', 0
 state5message: db 'Cooling', 0
 clear:  db '                                   ', 0
+clear3:  db '   ', 0
 
 update_lcd:
-    ;Set_Cursor(1,1)
-    ;Send_Constant_String(#clear)
+    Set_Cursor(2,7)
+    Send_Constant_String(#clear3)
+
     Set_Cursor(2,1)
     Send_Constant_String(#runningTimeMessage)
-    Set_Cursor(2,14)
+    Set_Cursor(2,4)
     mov x+0, overall_time+0
     mov x+1, overall_time+1
     mov x+2, #0
     mov x+3, #0
-
     lcall hex2bcd
     lcall LCD_3BCD
 
-    Set_Cursor(1,14)
+    Set_Cursor(2,10)
+    Send_Constant_String(#stateTimeMessage)
+    Set_Cursor(2,14)
     mov x+0, state_time+0
     mov x+1, state_time+1
     mov x+2, #0
     mov x+3, #0
+    lcall hex2bcd
+    lcall LCD_3BCD
 
+    Set_Cursor(1,14)
+    mov x+0, temp_bcd+0
+    mov x+1, temp_bcd+1
+    mov x+2, #0
+    mov x+3, #0
     lcall hex2bcd
     lcall LCD_3BCD
 
