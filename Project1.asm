@@ -48,6 +48,7 @@ dseg at 30H
   talker_counter: ds 1
   temp_truncated: ds 1
   temp_bcd: ds 2
+  Talk_temp: ds 2
   param_state: ds 1
   soak_temp: ds 1
   soak_time: ds 1

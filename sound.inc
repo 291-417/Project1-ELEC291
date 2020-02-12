@@ -22,6 +22,12 @@ $include(obamaindex_new.inc)
 
 Say_Stuff_FSM:
 	mov a, state
+
+	mov Talk_temp+0, temp_bcd+0
+	mov Talk_temp+1, temp_bcd+1
+	mov Talk_temp+2, temp_bcd+2
+	mov Talk_temp+3, temp_bcd+3
+
 	jnz Say_Stuff_FSM_Begin_Saying_Things
 	;mov a, #36
 	;lcall Play_Numbered
@@ -78,7 +84,7 @@ Check_States_Talk:
 		ljmp End_Talking
 	skip_state_call:
 
-	mov a, temp_bcd+1
+	mov a, Talk_temp+1
 	inc r0
 	jz Tens_Sound_No_Hundred ; if we're under 100 then go to printing the lower digits
 Number_Of_Hundreds:
@@ -101,14 +107,14 @@ Tens_Sound_No_Hundred:
 	dec r0
 Tens_Sound:
 	clr c
-	mov a, temp_bcd+0
+	mov a, Talk_temp+0
 	subb a, #0x20
 	jc Single_Tens_Sound ; If less than 20, that is, if carry flag is set, only need to say one sound
 	inc r0
 	clr c
 	mov a, r0
 	cjne a, talker_counter, Ones_Sound
-	mov a, temp_bcd+0
+	mov a, Talk_temp+0
 	anl a, #0xf0 ; say upper character only
 	swap a ; now the upper character is in the lower character
 	add a, #18 ; Now we should have character number to say in accumulator
@@ -120,11 +126,11 @@ Single_Tens_Sound:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Say_No_More
-	mov a, temp_bcd+0
+	mov a, Talk_temp+0
 	jz Say_No_More ; if zero then you don't need to say anything
 	anl a, #0x0f ; get only ones digit
 	mov r1, a ; save ones digit in r1
-	mov a, temp_bcd+0
+	mov a, Talk_temp+0
 	anl a, #0xf0 ; get only tens digit
 	swap a ; put tens digit in ones digit
 	mov b, #10
@@ -137,7 +143,7 @@ Ones_Sound:
 	inc r0
 	mov a, r0
 	cjne a, talker_counter, Say_No_More
-	mov a, temp_bcd+0
+	mov a, Talk_temp+0
 	anl a, #0x0f ; get only ones digit
 	lcall Play_Numbered
   inc talker_counter ; say ones digit
