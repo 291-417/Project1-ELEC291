@@ -66,6 +66,7 @@ state2:
 
     Set_Cursor(1,10)            ;display soak time debugging 
     
+    ;Set_Cursor(2,11)
     mov x+0, soak_time
     mov x+1, #0
     mov x+2, #0
