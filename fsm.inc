@@ -120,7 +120,7 @@ state5:
     mov a, temp_truncated
     clr c
     subb a, #60 ; if less than 60 carry is set
-    jc state5_done
+    jnc state5_done
     mov state_time, #0
     mov state, #0
 state5_done:
