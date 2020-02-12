@@ -102,14 +102,12 @@ pstate3:
 
 pstate3_done:
     ret
-
 ;----------------------------------------------------------------
 
 
 check_increment:
     jnb PB4, decrement
     jnb PB5, increment
-    jnb PB6, default
     ret
 
 increment:
@@ -131,13 +129,7 @@ decrement:
     ;cjne a, #0, check_button5_done
     ret
 
-default:
-    mov soak_temp, #150
-    mov soak_time, #60
-    mov reflow_temp, #220
-    mov reflow_time, #60
-    Wait_Milli_Seconds(#155)
-    ret
+
 
 check_button4_done:
     add a, #0x01
@@ -160,10 +152,10 @@ param4message: db 'C ', 0
 param5message: db 's ', 0
 spacebar: db ' ', 0
 
-param0messageNor: db 'Bløt Temp    ', 0
-param1messageNor: db 'Bløt Tid     ', 0
+param0messageNor: db 'Bløt Temp     ', 0
+param1messageNor: db 'Bløt Tid      ', 0
 param2messageNor: db 'Gjenflyt Temp', 0
-param3messageNor: db 'Gjenflyt Time', 0
+param3messageNor: db 'Gjenflyt Tid ', 0
 param4messageNor: db 'C ', 0
 param5messageNor: db 's ', 0
 
@@ -171,22 +163,23 @@ check_state0_param_nor_jump:
     ljmp check_state0_param_nor
 ;-----------------------------------------------------------------------
 update_lcd_param:
-    Set_Cursor(1,11)
-    Display_char(#01111100b)                    ;divisors for language
 
-    Set_Cursor(2,11)
+    Set_Cursor(2,9)
     Display_char(#01111100b)
-
+    
     mov a, language
     cjne a, #0, check_state0_param_nor_jump
 
+    mov a, language
+    cjne a, #3, check_state0_param_nor_jump
+
     mov a, param_state
     cjne a, #0, check_state1_param
+
     Set_Cursor(1,1)
     Send_Constant_String(#param0message)
     Set_Cursor(2,4)
     Display_char(#11011111b)
-    ;lcall ?WriteCommand
     Set_Cursor(2,5)
     Send_Constant_String(#param4message)
 
@@ -250,7 +243,7 @@ check_state3_param:
     lcall hex2bcd
     lcall LCD_3BCD
     ret 
-
+;------------------------------------------ NOR -----------------------------------------
 check_state0_param_nor:
     mov a, param_state
     cjne a, #0, check_state1_param_nor
@@ -259,7 +252,6 @@ check_state0_param_nor:
     Send_Constant_String(#param0messageNor)
     Set_Cursor(2,4)
     Display_char(#11011111b)
-    ;lcall ?WriteCommand
     Set_Cursor(2,5)
     Send_Constant_String(#param4messageNor)
 
@@ -271,17 +263,22 @@ check_state0_param_nor:
 
     lcall hex2bcd
     lcall LCD_3BCD
+    ret
     
 
 check_state1_param_nor:  
     mov a, language
-    cjne a, #0, check_state2_param_nor
+    cjne a, #1, check_state2_param_nor
     Set_Cursor(1,1)
     Send_Constant_String(#param1messageNor)
     Set_Cursor(2,4)
     Send_Constant_String(#param5messageNor)
     Set_Cursor(2,1)
-    
+    mov x+0, soak_time
+    mov x+1, #0
+    mov x+2, #0
+    mov x+3, #0
+
     lcall hex2bcd
     lcall LCD_3BCD
     ret  

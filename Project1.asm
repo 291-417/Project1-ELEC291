@@ -27,7 +27,6 @@ SOUND equ P2.7
 PWM_PIN equ P0.2
 STARTSTOP equ P2.1
 ABORT equ P0.1
-
 FLASH_CE    EQU P2.4
 
 dseg at 30H
@@ -167,10 +166,10 @@ MainProgram:
   mov state, #0
   mov param_state, #0
 
-  mov soak_temp, #0
-  mov soak_time, #0
-  mov reflow_temp, #0
-  mov reflow_time, #0
+  mov soak_temp, #150
+  mov soak_time, #60
+  mov reflow_temp, #220
+  mov reflow_time, #60
   mov language, #0
   
   lcall Sound_Start_Init
