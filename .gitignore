@@ -4,3 +4,4 @@ localFolder
 *.hex
 *.lst
 pEnv
+.vscode
