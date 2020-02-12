@@ -45,7 +45,7 @@ continue_state1:
     lcall divsadtimes
     mov a, temp_truncated
     clr c
-    subb a, #150 ; if less that 150 carry is set
+    subb a, soak_temp ; if less that soak_temp carry is set
     jc state1_done
     mov dptr, #title
 	lcall SendString
@@ -67,7 +67,7 @@ state2:
     setb TR0
     mov a, state_time
     clr c
-    subb a, #59 ; if less than 60 carry is set
+    subb a, soak_time ; if less than soak_time carry is set
     jc state2_done
     mov state, #3
     mov state_time, #0
@@ -81,7 +81,7 @@ state3:
     lcall divsadtimes
     mov a, temp_truncated
     clr c
-    subb a, #220 ; if less than 220 carry is set
+    subb a, reflow_temp ; if less than reflow_temp carry is set
     jc state3_done
     mov state_time, #0
     mov state, #4
@@ -94,7 +94,7 @@ state4:
     setb TR0
     mov a, state_time
     clr c
-    subb a, #45 ; if less than 45 carry is set
+    subb a, reflow_time ; if less than 45 carry is set
     jc state4_done
     mov state_time, #0
     mov state, #5
