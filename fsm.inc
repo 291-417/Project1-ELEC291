@@ -214,11 +214,12 @@ update_lcd:
     lcall LCD_3BCD
 
     Set_Cursor(1,12)
-    mov x+0, temp_bcd+0
-    mov x+1, temp_bcd+1
-    mov x+2, #0
-    mov x+3, #0
-    lcall hex2bcd
+    mov bcd+0, temp_bcd+0
+    mov bcd+1, temp_bcd+1
+    mov bcd+2, #0
+    mov bcd+3, #0
+    mov bcd+4, #0
+    ;lcall hex2bcd
     lcall LCD_3BCD
 
     Set_Cursor(1,15)
