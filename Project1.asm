@@ -277,6 +277,10 @@ Every_Second_Stuff:
   ;lcall SendHex
   ;mov b, reflow_time
   ;lcall SendHex
+  ;mov b, lmtemp+1
+  ;lcall SendHex
+  ;mov b, lmtemp+0
+  ;lcall SendHex
   Set_Cursor(1,1)
   Send_Constant_String(#clear)
   Set_Cursor(2,1)

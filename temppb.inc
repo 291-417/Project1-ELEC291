@@ -296,9 +296,9 @@ accumulate_loop_Thermocouple:
 	; x has now the 12-bit representation of the temperature
 
 	; Convert to temperature (C)
-	Load_y(33000) ; Vref is 3.3V
+	Load_y(33000*100) ; Vref is 3.3V
 	lcall mul32
-	Load_y(((1<<12)-1)) ; 2^12-1
+	Load_y(((1<<12)-1)*114) ; 2^12-1
 	lcall div32	
 
 	mov thermotemp+0, x+0
