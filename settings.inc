@@ -65,6 +65,11 @@ pstate0:
     lcall check_increment
     mov soak_temp, a
 
+    clr c
+    subb a, #236                     ;if less than 45, carry high
+    jc pstate0_done
+    mov soak_temp, #0
+
 pstate0_done:
     ret
 
@@ -124,20 +129,12 @@ increment:
     mov a, b
     jc check_button4_done
     mov a, #0
-    Wait_Milli_Seconds(#50)
     ret
 
 decrement:
     clr c
     ljmp check_button5_done
     mov a, #255
-    Wait_Milli_Seconds(#50)
-
-    push acc
-    mov a, reflow_time
-    cjne a, #0, return_dec
-    mov reflow_time, #45
-    pop acc
 
 return_dec:
     ret
@@ -146,12 +143,12 @@ return_dec:
 
 check_button4_done:
     add a, #0x01
-    Wait_Milli_Seconds(#155)
+    Wait_Milli_Seconds(#255)
     ret
 
 check_button5_done:
     add a, #0xFF   ;if PB5 is pressed, increment a
-    Wait_Milli_Seconds(#155)
+    Wait_Milli_Seconds(#255)
     ret
 ;-----------------------------------------------------------------------
 
