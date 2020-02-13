@@ -68,7 +68,7 @@ check_time_state1:
 state2:
     cjne a, #2, state3
 
-    mov pwm_percentage, #20
+    mov pwm_percentage, #15
     setb TR0
     mov a, state_time+0
     clr c
@@ -95,7 +95,7 @@ state3_done:
 ;                                     REFLOW state
 state4:
     cjne a, #4, state5
-    mov pwm_percentage, #20
+    mov pwm_percentage, #15
     setb TR0
     mov a, state_time
     clr c
