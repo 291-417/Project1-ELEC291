@@ -168,10 +168,10 @@ MainProgram:
   mov state, #0
   mov param_state, #0
 
-  mov soak_temp, #130
-  mov soak_time, #30
-  mov reflow_temp, #215
-  mov reflow_time, #45
+  mov soak_temp, #150
+  mov soak_time, #60
+  mov reflow_temp, #225
+  mov reflow_time, #60
   mov language, #0
   
   lcall Sound_Start_Init
@@ -276,10 +276,6 @@ Every_Second_Stuff:
   ;mov b, state_time
   ;lcall SendHex
   ;mov b, reflow_time
-  ;lcall SendHex
-  ;mov b, lmtemp+1
-  ;lcall SendHex
-  ;mov b, lmtemp+0
   ;lcall SendHex
   Set_Cursor(1,1)
   Send_Constant_String(#clear)

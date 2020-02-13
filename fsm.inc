@@ -14,7 +14,7 @@
 fsm_update:
 
     mov a, temp_truncated
-    subb a, #235 ; if less than 50 carry is set
+    subb a, #240 ; if less than 240 carry is set
     jc state0
     mov state, #5
 
