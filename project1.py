@@ -94,7 +94,7 @@ def run(data):
             list_ave = sum(temp_list) / len(temp_list)
 
             #if the 
-            if list_ave >= 200 and ave_delta_temp <= -2 and print_list[4] == 0:
+            if list_ave >= 200 and ave_delta_temp <= -1.5 and print_list[4] == 0:
                 ax.annotate("Cooling Down", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:blue'))
                 #write back that the 
                 print_list[4] = 1
@@ -102,7 +102,7 @@ def run(data):
                 print_list[2] = 1
                 print_list[1] = 1
                 print_list[0] = 1
-            if list_ave >= 200 and ave_delta_temp >= 1 and print_list[3] == 0:
+            if list_ave >= 200 and ave_delta_temp <= 1 and print_list[3] == 0:
                 ax.annotate("Entering Reflow", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:red'))
                 print_list[3] = 1
                 print_list[2] = 1
@@ -113,7 +113,7 @@ def run(data):
                 print_list[2] = 1
                 print_list[1] = 1
                 print_list[0] = 1
-            if list_ave >= 135 and ave_delta_temp >= 1.5 and print_list[1] == 0:
+            if list_ave >= 135 and ave_delta_temp <= 1.5 and print_list[1] == 0:
                 ax.annotate("Entering Preheat Soak", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:gray'))
                 print_list[1] = 1
                 print_list[0] = 1
