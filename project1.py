@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import sys, math
 import msvcrt
+import csv
 if msvcrt.kbhit():
         key_stroke = msvcrt.getch()
         print(key_stroke)

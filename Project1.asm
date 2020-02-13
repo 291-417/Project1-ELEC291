@@ -168,9 +168,9 @@ MainProgram:
   mov state, #0
   mov param_state, #0
 
-  mov soak_temp, #150
+  mov soak_temp, #130
   mov soak_time, #60
-  mov reflow_temp, #225
+  mov reflow_temp, #220
   mov reflow_time, #60
   mov language, #0
   
