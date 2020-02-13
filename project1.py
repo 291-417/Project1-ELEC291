@@ -48,7 +48,7 @@ def run(data):
         ydata1.append(y1)
 
         #Ryan asked for the graph to scale the t axis
-        ax.set_xlim(0,t+10)
+        ax.set_xlim(0,t+5)
 
         #Makes the graph scroll to the left if t is greater then the max t
         #if t>xsize: # Scroll to the left.
