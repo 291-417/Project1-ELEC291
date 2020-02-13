@@ -115,6 +115,8 @@ state5:
     clr c
     subb a, #60 ; if less than 60 carry is set
     jnc state5_done
+    mov a, #34
+    lcall Play_Numbered
     mov state_time, #0
     mov state, #0 
 state5_done:

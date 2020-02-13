@@ -19,7 +19,10 @@ ser = serial.Serial(
     )
 ser.isOpen()
 
-
+print_list = [0,0,0,0,0]
+ave_delta_temp = 0
+ann_delta_t = None
+last_temp_print = 0
 
 xsize=100
 
@@ -28,7 +31,7 @@ def data_gen():
     while True:
         t+=1
         strvar = ser.readline()
-        strvar = float(strvar.decode('utf-8'))*(410/1023) - 273.15
+        strvar = float(strvar.decode('utf-8'))#*(410/1023) - 273.15
         print(strvar)
         val=strvar
         yield t, val
@@ -99,12 +102,12 @@ data_gen.t = -1
 fig = plt.figure()
 fig.canvas.mpl_connect('close_event', on_close_figure)
 ax = fig.add_subplot(111)
-line, = ax.plot([], [], lw=2)
-#ax.set_ylim(-100, 100)
+line1, = ax.plot([], [], lw=2)
+ax.set_ylim(0, 250)
 ax.set(title="Tempurature over Time", xlabel="Time (seconds)", ylabel="Tempurature (deg C)")
 ax.set_xlim(0, xsize)
 ax.grid()
-xdata, ydata = [], []
+xdata, ydata1 = [], []
 
 # Important: Although blit=True makes graphing faster, we need blit=False to prevent
 # spurious lines to appear when resizing the stripchart.
