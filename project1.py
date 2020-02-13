@@ -131,10 +131,9 @@ def on_close_figure(event):
 
     with data_file:
         writer = csv.writer(data_file)
-        for row in ydata1:
-            writer.writerow(row)        
+        writer.writerow(ydata1)        
         data_file.close()
-
+        
     sys.exit(0)
 
 data_gen.t = -1
