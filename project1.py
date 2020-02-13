@@ -23,6 +23,8 @@ print_list = [0,0,0,0,0]
 ave_delta_temp = 0
 ann_delta_t = None
 last_temp_print = 0
+xdata = []
+ydata1 = []
 
 xsize=250
 
@@ -42,6 +44,8 @@ def run(data):
     global ave_delta_temp
     global ann_delta_t
     global last_temp_print
+    global xdata
+    global ydata1
     t,y1 = data
     if t>-1:
         xdata.append(t)
@@ -90,27 +94,47 @@ def run(data):
             list_ave = sum(temp_list) / len(temp_list)
 
             #if the 
-            if list_ave >=150 and ave_delta_temp <= -2 and print_list[4] == 0:
+            if list_ave >= 200 and ave_delta_temp <= -2 and print_list[4] == 0:
                 ax.annotate("Cooling Down", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:blue'))
                 #write back that the 
-                print_list[4] =1
-
+                print_list[4] = 1
+                print_list[3] = 1
+                print_list[2] = 1
+                print_list[1] = 1
+                print_list[0] = 1
             if list_ave >= 200 and ave_delta_temp >= 1 and print_list[3] == 0:
                 ax.annotate("Entering Reflow", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:red'))
-                print_list[3] =1
-            if list_ave >= 150 and ave_delta_temp >= 2 and print_list[2] == 0:
+                print_list[3] = 1
+                print_list[2] = 1
+                print_list[1] = 1
+                print_list[0] = 1
+            if list_ave >= 150 and ave_delta_temp >= 1.5 and print_list[2] == 0:
                 ax.annotate("Ramp to Peak", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:green'))
-                print_list[2] =1
-            if list_ave >= 145 and ave_delta_temp >= 2 and print_list[1] == 0:
+                print_list[2] = 1
+                print_list[1] = 1
+                print_list[0] = 1
+            if list_ave >= 135 and ave_delta_temp >= 1.5 and print_list[1] == 0:
                 ax.annotate("Entering Preheat Soak", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1-125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc='tab:gray'))
-                print_list[1] =1
-            if list_ave >= 30 and ave_delta_temp>= 2 and print_list[0] == 0:
+                print_list[1] = 1
+                print_list[0] = 1
+            if list_ave >= 30 and ave_delta_temp>= 1.5 and print_list[0] == 0:
                 ax.annotate("Ramp to Soak", xy=(t, y1), xycoords=ax.transData,xytext=(t, y1+125), textcoords=ax.transData,arrowprops=dict(arrowstyle="->"), bbox=dict(boxstyle="round", fc="w"))
                 print_list[0] = 1
                 
     return line1
 
 def on_close_figure(event):
+    global xdata
+    global ydata1
+
+    data_file = open('TempData.csv', 'a')
+
+    with data_file:
+        writer = csv.writer(data_file)
+        for row in ydata1:
+            writer.writerow(row)        
+        data_file.close()
+
     sys.exit(0)
 
 data_gen.t = -1
