@@ -206,6 +206,7 @@ Thermocouple: db 'Thermocouple difference: ', 0
 Total: db 'Total Temp: ',0 
 Temp: db 'Temp from LM335: ', 0
 blank: db '                 ', 0
+
 Read_Temperature:
 	clr EA
   	Load_X(0)

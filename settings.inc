@@ -85,9 +85,13 @@ pstate2:
     lcall update_lcd_param
     mov a, reflow_temp
     mov b, reflow_temp
-
     lcall check_increment
     mov reflow_temp, a
+
+    clr c
+    subb a, #236                     ;if less than 45, carry high
+    jc pstate2_done
+    mov reflow_temp, #0
 
 pstate2_done:
     ret
@@ -98,6 +102,11 @@ pstate3:
     mov b, reflow_time
     lcall check_increment
     mov reflow_time, a
+
+    clr c
+    subb a, #46                     ;if less than 45, carry high
+    jc pstate3_done
+    mov reflow_time, #0
 
 pstate3_done:
     ret
@@ -115,13 +124,22 @@ increment:
     mov a, b
     jc check_button4_done
     mov a, #0
+    Wait_Milli_Seconds(#50)
     ret
 
 decrement:
     clr c
     ljmp check_button5_done
     mov a, #255
+    Wait_Milli_Seconds(#50)
 
+    push acc
+    mov a, reflow_time
+    cjne a, #0, return_dec
+    mov reflow_time, #45
+    pop acc
+
+return_dec:
     ret
 
 
@@ -202,9 +220,9 @@ update_lcd_param:
     Send_Constant_String(#param1message)
     Set_Cursor(2,4)
     Send_Constant_String(#param5message)
-    Set_Cursor(2,1)
     lcall Lan_and_line
 
+    Set_Cursor(2,1)
     mov x+0, soak_time
     mov x+1, #0
     mov x+2, #0

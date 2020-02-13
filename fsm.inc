@@ -13,9 +13,13 @@
 
 fsm_update:
 
-mov a, state
+    mov a, temp_truncated
+    subb a, #235 ; if less than 50 carry is set
+    jc state0
+    mov state, #5
 
 state0:
+    mov a, state
     cjne a, #0, state1 ; check if in state 0
     mov overall_time+0, #0x0
     mov overall_time+1, #0x0
@@ -88,14 +92,14 @@ state3:
     mov state, #4
 state3_done:
     ret
-;                           REFLOW state
+;                                     REFLOW state
 state4:
     cjne a, #4, state5
     mov pwm_percentage, #20
     setb TR0
     mov a, state_time
     clr c
-    subb a, reflow_time ; if less than 45 carry is set
+    subb a, reflow_time ; if less than REFLOW_TIME carry is set
     jc state4_done
     mov state_time, #0
     mov state, #5
