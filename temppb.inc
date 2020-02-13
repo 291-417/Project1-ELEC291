@@ -300,7 +300,7 @@ accumulate_loop_Thermocouple:
 	lcall mul32
 	Load_y(((1<<12)-1)) ; 2^12-1
 	lcall div32	
-	Load_y(125)
+	Load_y(130)
 	lcall mul32
 	Load_y(100)
 	lcall div32
