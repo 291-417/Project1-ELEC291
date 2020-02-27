@@ -153,6 +153,7 @@ divsadtimes:
     push ar0
     push acc
     
+    ; Convert temp_bcd into temp_truncated because we want integer value, and this is more accurate than other methods
     mov a, temp_bcd+0
     anl a, #0x0f
     mov r0, a
